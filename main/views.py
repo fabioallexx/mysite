@@ -1,7 +1,8 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpResponseRedirect
-from .models import ToDoList, Item
+from .models import ToDoList, Item, UploadedFile
 from .forms import CreateNewList
+import os
 
 def index(response, id):
     ls = ToDoList.objects.get(id=id)
@@ -46,3 +47,10 @@ def create(response):
 
 def view(response):
     return render(response, "main/view.html", {})
+
+def upload_file(request):
+    if request.method == 'POST' and request.FILES.get('file'):
+        uploaded_file = UploadedFile(file=request.FILES['file'])
+        uploaded_file.save()
+        return render(request, 'main/home.html', {'file_url': uploaded_file.file.url})
+    return redirect('home')  # Substitua 'home' pelo nome da sua view de home
