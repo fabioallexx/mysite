@@ -50,7 +50,8 @@ def view(response):
 
 def upload_file(request):
     if request.method == 'POST' and request.FILES.get('file'):
-        uploaded_file = UploadedFile(file=request.FILES['file'])
-        uploaded_file.save()
-        return render(request, 'main/home.html', {'file_url': uploaded_file.file.url})
-    return redirect('home')  # Substitua 'home' pelo nome da sua view de home
+        uploaded_file = request.FILES['file']
+        file_instance = UploadedFile(file=uploaded_file, name=uploaded_file.name, user=request.user)
+        file_instance.save()
+        return redirect('home')
+    return redirect('home')

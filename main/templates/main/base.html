@@ -1,5 +1,6 @@
+{% load static %}
 <!doctype html>
-<html lang="pt-BR">
+<html lang="pt-PT">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -8,6 +9,24 @@
     integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 
     <style type="text/css">
+        body {
+            position: relative; /* Para permitir posicionar a marca d'água */
+            overflow: hidden; /* Para evitar rolagem extra */
+        }
+        header {
+            background-color: white; /* Fundo branco para o cabeçalho */
+        }
+        .watermark {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 50%; /* Ajuste a largura conforme necessário */
+            height: auto;
+            opacity: 0.1; /* Ajuste a opacidade conforme desejado */
+            z-index: -1; /* Coloca a imagem atrás de outros elementos */
+            pointer-events: none; /* Para evitar interações com a imagem */
+        }
         .sidenav {
             height: 100%;
             width: 160px;
@@ -58,6 +77,14 @@
         .toggle-btn:hover {
             background-color: #000000;
         }
+        img {
+            border-radius: 5px; /* Para bordas arredondadas */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Sombra leve */
+        }
+        img:hover {
+            transform: scale(1.05);
+            transition: transform 0.3s ease;
+        }
     </style>
 
     <title>{% block title %}Contratos{% endblock %}</title>
@@ -83,7 +110,11 @@
     <div id="content" name="content" class="main">
         <div class="row justify-content-center">
             <div class="col-8">
-                <h1 class="mt-2">Gestão de Contratos</h1>
+                <h1 class="mt-2"><header class="py-3">
+                    <div class="container">
+                        <img src="{% static 'images/logotipo-moita.png' %}" alt="Logotipo da Empresa" class="img-fluid" style="max-height: 60px;">
+                    </div>
+                </header></h1>
                 <hr class="mt-0 mb-4">
                 {% block content %}
                 {% endblock %}

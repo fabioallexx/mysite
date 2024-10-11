@@ -1,12 +1,14 @@
 {% extends 'main/base.html' %}
-
-{% block title %}
-Home
-{% endblock %}
-
 {% block content %}
 <h1>Contratos Ativos</h1>
 {% if user.is_authenticated %}
+<div>
+    {% for uf in user.uploadedfile.all %}
+        <p><a href="{{ uf.file.url }}">{{ uf.name }}</a></p>
+    {% empty %}
+        <p>Nenhum contrato carregado.</p>
+    {% endfor %}
+</div>
 <div style="position: fixed; bottom: 20px; right: 20px; display: flex; gap: 10px;">
     <form method="POST" enctype="multipart/form-data" action="{% url 'upload_file' %}">
         {% csrf_token %}
@@ -22,7 +24,6 @@ Home
     </form>
 </div>
 
-
 <script>
     function handleFileSelect(event) {
         const submitBtn = document.getElementById('submit-btn');
@@ -36,5 +37,4 @@ Home
     }
 </script>
 {% endif %}
-
 {% endblock %}

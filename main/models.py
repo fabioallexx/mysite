@@ -19,8 +19,9 @@ class Item(models.Model):
 		return self.text
 
 class UploadedFile(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='uploadedfile')
     file = models.FileField(upload_to='uploads/')
-    uploaded_at = models.DateTimeField(auto_now_add=True)
+    name = models.CharField(max_length=255)
 
     def __str__(self):
-        return self.file.name
+        return self.name
