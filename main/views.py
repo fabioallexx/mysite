@@ -2,7 +2,6 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpResponseRedirect
 from .models import ToDoList, Item, UploadedFile
 from .forms import CreateNewList
-import os
 
 def index(response, id):
     ls = ToDoList.objects.get(id=id)

@@ -10,22 +10,22 @@
 
     <style type="text/css">
         body {
-            position: relative; /* Para permitir posicionar a marca d'água */
-            overflow: hidden; /* Para evitar rolagem extra */
+            position: relative;
+            overflow: hidden;
         }
         header {
-            background-color: white; /* Fundo branco para o cabeçalho */
+            background-color: white;
         }
         .watermark {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 50%; /* Ajuste a largura conforme necessário */
+            width: 50%;
             height: auto;
-            opacity: 0.1; /* Ajuste a opacidade conforme desejado */
-            z-index: -1; /* Coloca a imagem atrás de outros elementos */
-            pointer-events: none; /* Para evitar interações com a imagem */
+            opacity: 0.1;
+            z-index: -1;
+            pointer-events: none;
         }
         .sidenav {
             height: 100%;
@@ -41,7 +41,7 @@
             transform: translateX(0);
         }
         .sidenav.hidden {
-            transform: translateX(-94%); /* Esconder a sidenav */
+            transform: translateX(-94%);
         }
         .sidenav a {
             padding: 6px 8px 6px 16px;
@@ -78,8 +78,8 @@
             background-color: #000000;
         }
         img {
-            border-radius: 5px; /* Para bordas arredondadas */
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Sombra leve */
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
         img:hover {
             transform: scale(1.05);
