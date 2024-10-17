@@ -7,46 +7,87 @@
 
 <form method="POST" action="{% url 'contrato_info' file_id=uploaded_file.id %}">
     {% csrf_token %}
-    
+
     <label for="procedimento"><strong>Procedimento:</strong></label>
     <select id="procedimento" name="procedimento" style="margin-right: 15px;">
-        <option value="Consulta Prévia">Consulta Prévia</option>
-        <option value="Ajuste Direto">Ajuste Direto</option>
-        <option value="Concurso Público">Concurso Público</option>
+        <option value="Consulta Prévia" {% if procedimento == "Consulta Prévia" %}selected{% endif %}>Consulta Prévia</option>
+        <option value="Ajuste Direto" {% if procedimento == "Ajuste Direto" %}selected{% endif %}>Ajuste Direto</option>
+        <option value="Concurso Público" {% if procedimento == "Concurso Público" %}selected{% endif %}>Concurso Público</option>
     </select>
-    
+
     <label for="numero"><strong>Nº:</strong></label>
-    <input type="text" id="numero" name="numero" pattern="\d+" title="Apenas números" required>
+    <input type="text" id="numero" name="numero" pattern="\d+" title="Apenas números" required value="{{ numero }}">
 
     <br><br>
 
     <label for="tipo_contrato"><strong>Tipo de Contrato:</strong></label>
     <select id="tipo_contrato" name="tipo_contrato">
-        <option value="Bens">Bens</option>
-        <option value="Serviços">Serviços</option>
-        <option value="Empreitada">Empreitada</option>
+        <option value="Bens" {% if tipo_contrato == "Bens" %}selected{% endif %}>Bens</option>
+        <option value="Serviços" {% if tipo_contrato == "Serviços" %}selected{% endif %}>Serviços</option>
+        <option value="Empreitada" {% if tipo_contrato == "Empreitada" %}selected{% endif %}>Empreitada</option>
     </select>
 
     <br><br>
 
     <label for="fornecedor"><strong>Fornecedor:</strong></label>
-    <input type="text" id="nome" name="nome" size="60" required>
+    <input type="text" id="nome" name="nome" size="60" required value="{{ fornecedor }}">
     
     <label for="nif" style="margin-left: 20px;"><strong>NIF:</strong></label>
-    <input type="text" id="nif" name="nif" pattern="\d{9}" maxlength="9" title="Apenas 9 números" required>
+    <input type="text" id="nif" name="nif" pattern="\d{9}" maxlength="9" title="Apenas 9 números" required value="{{ nif }}">
 
     <br><br>
 
     <label for="data_inicial"><strong>Data Inicial:</strong></label>
-    <input type="date" id="data_inicial" name="data_inicial" style="margin-right: 15px;" required>
+    <input type="date" id="data_inicial" name="data_inicial" style="margin-right: 15px;" required value="{{ data_inicial }}">
 
     <label for="data_final"><strong>Data Final:</strong></label>
-    <input type="date" id="data_final" name="data_final" required>
+    <input type="date" id="data_final" name="data_final" required value="{{ data_final }}">
+
+    <button type="submit" name="confirmar_datas" value="confirmar">Confirmar Datas</button>
 
     <br><br>
+
+    <label for="prazo"><strong>Prazo:</strong></label>
+    <input type="text" id="prazo" name="prazo" size="20" readonly style="background-color: #e9ecef;" value="{{ prazo }}">
+
+    <br><br>
+
+    <label for="preco_contratual"><strong>Preço Contratual:</strong></label>
+    <input type="text" id="preco_contratual" name="preco_contratual" size="18" required value="{{ preco_contratual }} €">
+
+    <br><br>
+
     <button type="submit">Salvar</button>
 </form>
 
 <a href="{% url 'contrato_info' file_id=uploaded_file.id %}">Voltar</a>
+
+<script>
+    function formatarPreco(input) {
+        // Remove tudo que não seja número ou vírgula
+        let valor = input.value.replace(/[^0-9,]/g, '');
+
+        // Divide o número em parte inteira e parte decimal
+        let partes = valor.split(',');
+        if (partes.length > 2) {
+            partes.pop(); // Remove a parte extra se houver mais de uma vírgula
+        }
+
+        // Formata a parte inteira
+        let inteiro = partes[0].replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+        let decimal = partes[1] ? ',' + partes[1] : ''; // Mantém a vírgula para a parte decimal
+
+        // Atualiza o campo de entrada com o valor formatado
+        input.value = inteiro + decimal; 
+    }
+
+    function permitirVirgula(event) {
+        const tecla = event.key;
+        // Permitir números, vírgula e teclas de controle
+        if (!/[\d,]/.test(tecla) && event.key !== "Backspace" && event.key !== "ArrowLeft" && event.key !== "ArrowRight") {
+            event.preventDefault();
+        }
+    }
+</script>
 
 {% endblock %}
