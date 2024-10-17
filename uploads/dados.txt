@@ -1,0 +1,4 @@
+IBAN                      SWIFT    MONTANTE  NOME
+
+PT50001832697896541023078 TOTAPTPL 50,00     Marco António Dias
+

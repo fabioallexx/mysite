@@ -9,4 +9,5 @@ urlpatterns = [
     path('create/', views.create, name='create'),
     path('view/', views.view, name='view'),
     path('upload/', views.upload_file, name='upload_file'),
+    path('contrato_info/<int:file_id>/', views.contrato_info, name='contrato_info'),  # Nova rota para informações do contrato
 ]

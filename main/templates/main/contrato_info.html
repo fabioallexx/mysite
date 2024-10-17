@@ -1,0 +1,52 @@
+{% extends 'main/base.html' %}
+
+{% block content %}
+<h1>Informações do Contrato</h1>
+
+<p><strong>Nome do Contrato:</strong> {{ uploaded_file.name }}</p>
+
+<form method="POST" action="{% url 'contrato_info' file_id=uploaded_file.id %}">
+    {% csrf_token %}
+    
+    <label for="procedimento"><strong>Procedimento:</strong></label>
+    <select id="procedimento" name="procedimento" style="margin-right: 15px;">
+        <option value="Consulta Prévia">Consulta Prévia</option>
+        <option value="Ajuste Direto">Ajuste Direto</option>
+        <option value="Concurso Público">Concurso Público</option>
+    </select>
+    
+    <label for="numero"><strong>Nº:</strong></label>
+    <input type="text" id="numero" name="numero" pattern="\d+" title="Apenas números" required>
+
+    <br><br>
+
+    <label for="tipo_contrato"><strong>Tipo de Contrato:</strong></label>
+    <select id="tipo_contrato" name="tipo_contrato">
+        <option value="Bens">Bens</option>
+        <option value="Serviços">Serviços</option>
+        <option value="Empreitada">Empreitada</option>
+    </select>
+
+    <br><br>
+
+    <label for="fornecedor"><strong>Fornecedor:</strong></label>
+    <input type="text" id="nome" name="nome" size="60" required>
+    
+    <label for="nif" style="margin-left: 20px;"><strong>NIF:</strong></label>
+    <input type="text" id="nif" name="nif" pattern="\d{9}" maxlength="9" title="Apenas 9 números" required>
+
+    <br><br>
+
+    <label for="data_inicial"><strong>Data Inicial:</strong></label>
+    <input type="date" id="data_inicial" name="data_inicial" style="margin-right: 15px;" required>
+
+    <label for="data_final"><strong>Data Final:</strong></label>
+    <input type="date" id="data_final" name="data_final" required>
+
+    <br><br>
+    <button type="submit">Salvar</button>
+</form>
+
+<a href="{% url 'contrato_info' file_id=uploaded_file.id %}">Voltar</a>
+
+{% endblock %}

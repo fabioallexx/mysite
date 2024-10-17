@@ -52,5 +52,26 @@ def upload_file(request):
         uploaded_file = request.FILES['file']
         file_instance = UploadedFile(file=uploaded_file, name=uploaded_file.name, user=request.user)
         file_instance.save()
-        return redirect('home')
+        return redirect('contrato_info', file_id=file_instance.id)
     return redirect('home')
+
+def contrato_info(request, file_id):
+    uploaded_file = UploadedFile.objects.get(id=file_id, user=request.user)
+    
+    if request.method == "POST":
+        procedimento = request.POST.get("procedimento")
+        numero = request.POST.get("numero")
+        tipo_contrato = request.POST.get("tipo_contrato")
+        fornecedor = fornecedor.POST.get("fornecedor")
+        nif = nif.POST.get("nif")
+        
+        print(f"Procedimento selecionado: {procedimento}")
+        print(f"Número inserido: {numero}")
+        print(f"Tipo de Contrato: {tipo_contrato}")
+        print(f"Fornecedor: {fornecedor}")
+        print(f"NIF: {nif}")
+
+        return render(request, 'main/contrato_info.html', {'uploaded_file': uploaded_file, 'procedimento': procedimento, 'numero': numero, 'tipo_contrato': tipo_contrato, 'fornecedor': fornecedor,
+        'nif': nif})
+    
+    return render(request, 'main/contrato_info.html', {'uploaded_file': uploaded_file})
