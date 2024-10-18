@@ -101,39 +101,62 @@ def contrato_info(request, file_id):
     preco_contratual = ""
     observacao = ""
     anos_plurianual = []
+    valor_entregue = ""
+    recorrente = ""
+    compromisso = ""
     
     if request.method == "POST":
-        data_inicial = request.POST.get("data_inicial")
-        data_final = request.POST.get("data_final")
+        data_inicial = request.POST.get("data_inicial", "")
+        data_final = request.POST.get("data_final", "")
 
         if "confirmar_datas" in request.POST and data_inicial and data_final:
             prazo = calcular_diferenca(data_inicial, data_final)
             anos_plurianual = gerar_plurianual(data_inicial, data_final)
 
-        procedimento = request.POST.get("procedimento")
-        numero = request.POST.get("numero")
-        tipo_contrato = request.POST.get("tipo_contrato")
-        fornecedor = request.POST.get("nome")
-        nif = request.POST.get("nif")
-        preco_contratual = request.POST.get("preco_contratual").replace('€', '').strip()
-        observacao = request.POST.get("observacao")
+        procedimento = request.POST.get("procedimento", "")
+        numero = request.POST.get("numero", "")
+        tipo_contrato = request.POST.get("tipo_contrato", "")
+        fornecedor = request.POST.get("nome", "")
+        nif = request.POST.get("nif", "")
+        observacao = request.POST.get("observacao", "")
+        recorrente = request.POST.get ("recorrente", "")
+        compromisso = request.POST.get ("compromisso", "")
+
+        preco_contratual = request.POST.get("preco_contratual", "")
+        if preco_contratual:
+            preco_contratual = preco_contratual.replace('€', '').strip()
+
+        valor_entregue = request.POST.get("valor_entregue", "")
+        if valor_entregue:
+            valor_entregue = valor_entregue.replace('€', '').strip()
         
     else:
-        procedimento = request.POST.get("procedimento")
-        numero = request.POST.get("numero")
-        tipo_contrato = request.POST.get("tipo_contrato")
-        fornecedor = request.POST.get("nome")
-        nif = request.POST.get("nif")
-        preco_contratual = request.POST.get("preco_contratual").replace('€', '').strip() 
-        observacao = request.POST.ger("observacao")
+        procedimento = request.POST.get("procedimento", "")
+        numero = request.POST.get("numero", "")
+        tipo_contrato = request.POST.get("tipo_contrato", "")
+        fornecedor = request.POST.get("nome", "")
+        nif = request.POST.get("nif", "")
+        observacao = request.POST.get("observacao", "")
+        recorrente = request.POST.get ("recorrente", "")
+        compromisso = request.POST.get ("compromisso", "")
 
+        preco_contratual = request.POST.get("preco_contratual", "")
+        if preco_contratual:
+            preco_contratual = preco_contratual.replace('€', '').strip()
+
+        valor_entregue = request.POST.get("valor_entregue", "")
+        if valor_entregue:
+            valor_entregue = valor_entregue.replace('€', '').strip()
         print(f"Procedimento selecionado: {procedimento}")
         print(f"Número inserido: {numero}")
         print(f"Tipo de Contrato: {tipo_contrato}")
         print(f"Fornecedor: {fornecedor}")
         print(f"NIF: {nif}")
         print(f"Preço Contratual: {preco_contratual}")
-        print(f"Observação: {observacao}")
+        print(f"Observações: {observacao}")
+        print(f"Valor Entregue: {valor_entregue}")
+        print(f"Recorrente: {recorrente}")
+        print(f"Compromisso: {compromisso}")
 
     return render(request, 'main/contrato_info.html', {
         'uploaded_file': uploaded_file,
@@ -147,7 +170,10 @@ def contrato_info(request, file_id):
         'prazo': prazo,
         'preco_contratual': preco_contratual,
         'observacao': observacao,
-        'anos_plurianual': anos_plurianual,  # Passar a lista de anos para o template
+        'anos_plurianual': anos_plurianual,
+        'valor_entregue' : valor_entregue,
+        'recorrente' : recorrente,
+        'compromisso' : compromisso,
     })
 
     return render(request, 'main/contrato_info.html', {'uploaded_file': uploaded_file})

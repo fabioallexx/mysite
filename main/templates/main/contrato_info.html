@@ -55,19 +55,42 @@
 
     <br><br>
 
-    <label for="observacao"><strong>Observação:</strong></label>
+    <label for="observacao"><strong>Observações:</strong></label>
     <input type="text" id="observacao" name="observacao" size="60" required value="{{ observacao }}">
 
     <br><br>
 
-    <label for="plurianual"><strong>Plurianual:</strong></label>
-    <div style="display: flex; gap: 10px;">
-        {% for ano in anos_plurianual %}
-            <div style="border: 1px solid #ccc; padding: 5px;">
-                {{ ano }}
+    <h1>Alertas</h1>
+    
+    <div style="display: flex; gap: 60px; align-items: flex-start;">
+        <div style="display: flex; flex-direction: column;">
+            <label for="plurianual"><strong>Plurianual:</strong></label>
+            <div style="display: flex; gap: 10px;">
+                {% for ano in anos_plurianual %}
+                    <div style="border: 1px solid #ccc; padding: 5px;">
+                        {{ ano }}
+                    </div>
+                {% endfor %}
             </div>
-        {% endfor %}
+        </div>
+    
+        <div style="display: flex; flex-direction: column;">
+            <label for="valor_entregue" style="margin-top: 10px;"><strong>Valor Entregue:</strong></label>
+            <input type="text" id="valor_entregue" name="valor_entregue" size="18" required value="{{ valor_entregue }}">
+        </div>
     </div>
+
+    <br><br>
+
+    <label for="recorrente"><strong>Recorrente:</strong></label>
+    <select id="recorrente" name="recorrente" style="margin-right: 15px;">
+        <option value="Sim" {% if procedimento == "Sim" %}selected{% endif %}>Sim</option>
+        <option value="Não" {% if procedimento == "Não" %}selected{% endif %}>Não</option>
+        <option value="N/a" {% if procedimento == "N/a" %}selected{% endif %}>N/a</option>
+    </select>
+
+    <label for="compromisso"><strong>Compromisso:</strong></label>
+    <input type="text" id="compromisso" name="compromisso" size="30; margin-right": 15px required value="{{ compromisso }}">
 
     <br><br>
 
@@ -110,5 +133,40 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 </script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const precoInput = document.getElementById('valor_entregue');
+    
+        precoInput.addEventListener('input', function (event) {
+            let value = precoInput.value;
+    
+            value = value.replace(/[^\d,]/g, '');
+    
+            if ((value.match(/,/g) || []).length > 1) {
+                value = value.replace(/,/g, '');
+            }
+    
+            let parts = value.split(',');
+            parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    
+            precoInput.value = parts.join(',');
+    
+            if (precoInput.value !== '' && !precoInput.value.includes('€')) {
+                precoInput.value += ' €';
+            }
+        });
+    
+        precoInput.addEventListener('focus', function () {
+            precoInput.value = precoInput.value.replace(' €', ''); 
+        });
+    
+        precoInput.addEventListener('blur', function () {
+            if (precoInput.value !== '' && !precoInput.value.includes('€')) {
+                precoInput.value += ' €';
+            }
+        });
+    });
+    </script>
 
 {% endblock %}
