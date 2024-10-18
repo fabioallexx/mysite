@@ -11,7 +11,7 @@
     <style type="text/css">
         body {
             position: relative;
-            overflow: hidden;
+            overflow: scroll;
         }
         header {
             background-color: white;
@@ -99,7 +99,7 @@
             {% if user.is_authenticated %}
                 <form method="post" action="{% url 'logout' %}">
                     {% csrf_token %}
-                    <button type="submit" class="btn btn-danger">Logout</button>
+                    <button type="submit" class="btn btn-info">Logout</button>
                 </form>
             {% else %}
                 <a href="{% url 'login' %}">Login</a>

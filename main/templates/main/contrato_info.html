@@ -1,6 +1,141 @@
 {% extends 'main/base.html' %}
 
 {% block content %}
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Informações do Contrato</title>
+    <style>
+    /* Cores */
+    :root {
+        --color1: #387788; /* Verde escuro */
+        --color2: #518fa1; /* Azul médio */
+        --color3: #69a7b9; /* Azul claro */
+        --color4: #82bfd2; /* Azul muito claro */
+        --color5: #9ad7ea; /* Azul quase branco */
+    }
+
+   /* Estilo do corpo */
+   body {
+        font-family: Arial, sans-serif;
+        background-color: var(--color5);
+        color: var(--color1);
+        margin: 0;
+        padding: 20px;
+    }
+
+     /* Títulos */
+     h1 {
+        color: var(--color1);
+        margin-bottom: 20px;
+        text-align: center;
+    }
+
+    /* Formulários */
+    form {
+        background-color: var(--color4);
+        border-radius: 10px; 
+        padding: 3px; 
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        max-width: 1000px; /* Limitar largura do formulário */
+        margin: auto; /* Centralizar o formulário */
+    }
+
+     /* Labels */
+     label {
+        font-weight: bold;
+        color: var(--color2);
+        margin-bottom: 5px;
+    }
+
+    /* Inputs e Selects */
+    input[type="text"],
+    input[type="date"],
+    select {
+        width: 30%;
+        padding: 3px;
+        border: 1px solid var(--color3);
+        border-radius: 20px;
+        margin-bottom: 5px;
+        background-color: white;
+        transition: border-color 0.3s;
+    }
+
+    input[type="text"]:focus,
+    input[type="date"]:focus,
+    select:focus {
+        border-color: var(--color2);
+    }
+
+    .btn-salv {
+        background-color: var(--color2);
+        color: white;
+        padding: 8px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+    .btn-salv:hover {
+        background-color: var(--color1);
+    }
+
+     /* Botões */
+     .btn-conf {
+        background-color: var(--color2);
+        color: white;
+        padding: 8px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+    .btn-conf:hover {
+        background-color: var(--color1);
+    }
+
+    /* Links */
+    a {
+        color: var(--color1);
+        text-decoration: none;
+        margin-top: 10px;
+        display: inline-block;
+        text-align: left; /* Centralizar o texto do link */
+    }
+
+    a:hover {
+        text-decoration: underline;
+    }
+
+    /* Divs para alertas */
+    .alert-container {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 30px;
+    }
+
+    .alert-box {
+        border: 1px solid var(--color3);
+        border-radius: 5px;
+        padding: 10px;
+        flex: 1;
+        margin-right: 10px;
+        background-color: var(--color4);
+    }
+
+    /* Remover margem do último alert-box */
+    .alert-box:last-child {
+        margin-right: 0;
+    }
+
+    </style>
+    
+</head>
+<body>
 <h1>Informações do Contrato</h1>
 
 <p><strong>Nome do Contrato:</strong> {{ uploaded_file.name }}</p>
@@ -9,7 +144,7 @@
     {% csrf_token %}
 
     <label for="procedimento"><strong>Procedimento:</strong></label>
-    <select id="procedimento" name="procedimento" style="margin-right: 15px;">
+    <select id="procedimento" name="procedimento" style="margin-right: 20px;">
         <option value="Consulta Prévia" {% if procedimento == "Consulta Prévia" %}selected{% endif %}>Consulta Prévia</option>
         <option value="Ajuste Direto" {% if procedimento == "Ajuste Direto" %}selected{% endif %}>Ajuste Direto</option>
         <option value="Concurso Público" {% if procedimento == "Concurso Público" %}selected{% endif %}>Concurso Público</option>
@@ -32,25 +167,25 @@
     <label for="fornecedor"><strong>Fornecedor:</strong></label>
     <input type="text" id="nome" name="nome" size="60" required value="{{ fornecedor }}">
     
-    <label for="nif" style="margin-left: 20px;"><strong>NIF:</strong></label>
+    <label for="nif" style="margin-left: 35px;"><strong>NIF:</strong></label>
     <input type="text" id="nif" name="nif" pattern="\d{9}" maxlength="9" title="Apenas 9 números" required value="{{ nif }}">
 
     <br><br>
 
     <label for="data_inicial"><strong>Data Inicial:</strong></label>
-    <input type="date" id="data_inicial" name="data_inicial" style="margin-right: 15px;" required value="{{ data_inicial }}">
+    <input type="date" id="data_inicial" name="data_inicial" style="margin-right: 20px;" required value="{{ data_inicial }}">
 
     <label for="data_final"><strong>Data Final:</strong></label>
     <input type="date" id="data_final" name="data_final" required value="{{ data_final }}">
 
-    <button type="submit" name="confirmar_datas" value="confirmar">Confirmar Datas</button>
+    <button type="submit" name="confirmar_datas" value="confirmar" class="btn-conf" id="btn-conf">Confirmar Datas</button>
 
     <br><br>
 
     <label for="prazo"><strong>Prazo:</strong></label>
     <input type="text" id="prazo" name="prazo" size="20" readonly style="background-color: #e9ecef; margin-right: 15px;" value="{{ prazo }}">
 
-    <label for="preco_contratual"><strong>Preço Contratual:</strong></label>
+    <label for="preco_contratual" style="margin-left: 50px;"><strong>Preço Contratual:</strong></label>
     <input type="text" id="preco_contratual" name="preco_contratual" size="18" required value="{{ preco_contratual }}">
 
     <br><br>
@@ -75,8 +210,8 @@
         </div>
     
         <div style="display: flex; flex-direction: column;">
-            <label for="valor_entregue" style="margin-top: 10px;"><strong>Valor Entregue:</strong></label>
-            <input type="text" id="valor_entregue" name="valor_entregue" size="18" required value="{{ valor_entregue }}">
+            <label for="valor_entregue" style="margin-top: 3px;"><strong>Valor Entregue:</strong></label>
+            <input type="text" id="valor_entregue" name="valor_entregue" size="50" required value="{{ valor_entregue }}">
         </div>
     </div>
 
@@ -94,7 +229,7 @@
 
     <br><br>
 
-    <button type="submit">Salvar</button>
+    <button type="submit" class="btn-salv" id="btn-salv">Salvar</button>
 </form>
 
 <a href="{% url 'contrato_info' file_id=uploaded_file.id %}">Voltar</a>
