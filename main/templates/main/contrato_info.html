@@ -48,12 +48,26 @@
     <br><br>
 
     <label for="prazo"><strong>Prazo:</strong></label>
-    <input type="text" id="prazo" name="prazo" size="20" readonly style="background-color: #e9ecef;" value="{{ prazo }}">
+    <input type="text" id="prazo" name="prazo" size="20" readonly style="background-color: #e9ecef; margin-right: 15px;" value="{{ prazo }}">
+
+    <label for="preco_contratual"><strong>Preço Contratual:</strong></label>
+    <input type="text" id="preco_contratual" name="preco_contratual" size="18" required value="{{ preco_contratual }}">
 
     <br><br>
 
-    <label for="preco_contratual"><strong>Preço Contratual:</strong></label>
-    <input type="text" id="preco_contratual" name="preco_contratual" size="18" required value="{{ preco_contratual }} €">
+    <label for="observacao"><strong>Observação:</strong></label>
+    <input type="text" id="observacao" name="observacao" size="60" required value="{{ observacao }}">
+
+    <br><br>
+
+    <label for="plurianual"><strong>Plurianual:</strong></label>
+    <div style="display: flex; gap: 10px;">
+        {% for ano in anos_plurianual %}
+            <div style="border: 1px solid #ccc; padding: 5px;">
+                {{ ano }}
+            </div>
+        {% endfor %}
+    </div>
 
     <br><br>
 
@@ -63,31 +77,38 @@
 <a href="{% url 'contrato_info' file_id=uploaded_file.id %}">Voltar</a>
 
 <script>
-    function formatarPreco(input) {
-        // Remove tudo que não seja número ou vírgula
-        let valor = input.value.replace(/[^0-9,]/g, '');
+document.addEventListener('DOMContentLoaded', function () {
+    const precoInput = document.getElementById('preco_contratual');
 
-        // Divide o número em parte inteira e parte decimal
-        let partes = valor.split(',');
-        if (partes.length > 2) {
-            partes.pop(); // Remove a parte extra se houver mais de uma vírgula
+    precoInput.addEventListener('input', function (event) {
+        let value = precoInput.value;
+
+        value = value.replace(/[^\d,]/g, '');
+
+        if ((value.match(/,/g) || []).length > 1) {
+            value = value.replace(/,/g, '');
         }
 
-        // Formata a parte inteira
-        let inteiro = partes[0].replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-        let decimal = partes[1] ? ',' + partes[1] : ''; // Mantém a vírgula para a parte decimal
+        let parts = value.split(',');
+        parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, '.');
 
-        // Atualiza o campo de entrada com o valor formatado
-        input.value = inteiro + decimal; 
-    }
+        precoInput.value = parts.join(',');
 
-    function permitirVirgula(event) {
-        const tecla = event.key;
-        // Permitir números, vírgula e teclas de controle
-        if (!/[\d,]/.test(tecla) && event.key !== "Backspace" && event.key !== "ArrowLeft" && event.key !== "ArrowRight") {
-            event.preventDefault();
+        if (precoInput.value !== '' && !precoInput.value.includes('€')) {
+            precoInput.value += ' €';
         }
-    }
+    });
+
+    precoInput.addEventListener('focus', function () {
+        precoInput.value = precoInput.value.replace(' €', ''); 
+    });
+
+    precoInput.addEventListener('blur', function () {
+        if (precoInput.value !== '' && !precoInput.value.includes('€')) {
+            precoInput.value += ' €';
+        }
+    });
+});
 </script>
 
 {% endblock %}

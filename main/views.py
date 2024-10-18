@@ -77,7 +77,15 @@ def calcular_diferenca(data_inicial, data_final):
     elif partes: 
         return partes[0]  
     
-    return "0 dias"  
+    return "0 dias" 
+
+def gerar_plurianual(data_inicial, data_final):
+    anos = []
+    if data_inicial and data_final:
+        ano_inicial = datetime.strptime(data_inicial, '%Y-%m-%d').year
+        ano_final = datetime.strptime(data_final, '%Y-%m-%d').year
+        anos = list(range(ano_inicial, ano_final + 1))
+    return anos
 
 def contrato_info(request, file_id):
     uploaded_file = UploadedFile.objects.get(id=file_id, user=request.user)
@@ -91,34 +99,41 @@ def contrato_info(request, file_id):
     data_final = ""
     prazo = ""
     preco_contratual = ""
+    observacao = ""
+    anos_plurianual = []
     
     if request.method == "POST":
-        if "confirmar_datas" in request.POST:
-            data_inicial = request.POST.get("data_inicial")
-            data_final = request.POST.get("data_final")
-            prazo = calcular_diferenca(data_inicial, data_final)
-            
-            procedimento = request.POST.get("procedimento")
-            numero = request.POST.get("numero")
-            tipo_contrato = request.POST.get("tipo_contrato")
-            fornecedor = request.POST.get("nome")
-            nif = request.POST.get("nif")
-            preco_contratual = request.POST.get("preco_contratual").replace('€', '').strip()
-        
-        else:
-            procedimento = request.POST.get("procedimento")
-            numero = request.POST.get("numero")
-            tipo_contrato = request.POST.get("tipo_contrato")
-            fornecedor = request.POST.get("nome")
-            nif = request.POST.get("nif")
-            preco_contratual = request.POST.get("preco_contratual").replace('€', '').strip() 
+        data_inicial = request.POST.get("data_inicial")
+        data_final = request.POST.get("data_final")
 
-            print(f"Procedimento selecionado: {procedimento}")
-            print(f"Número inserido: {numero}")
-            print(f"Tipo de Contrato: {tipo_contrato}")
-            print(f"Fornecedor: {fornecedor}")
-            print(f"NIF: {nif}")
-            print(f"Preço Contratual: {preco_contratual}")
+        if "confirmar_datas" in request.POST and data_inicial and data_final:
+            prazo = calcular_diferenca(data_inicial, data_final)
+            anos_plurianual = gerar_plurianual(data_inicial, data_final)
+
+        procedimento = request.POST.get("procedimento")
+        numero = request.POST.get("numero")
+        tipo_contrato = request.POST.get("tipo_contrato")
+        fornecedor = request.POST.get("nome")
+        nif = request.POST.get("nif")
+        preco_contratual = request.POST.get("preco_contratual").replace('€', '').strip()
+        observacao = request.POST.get("observacao")
+        
+    else:
+        procedimento = request.POST.get("procedimento")
+        numero = request.POST.get("numero")
+        tipo_contrato = request.POST.get("tipo_contrato")
+        fornecedor = request.POST.get("nome")
+        nif = request.POST.get("nif")
+        preco_contratual = request.POST.get("preco_contratual").replace('€', '').strip() 
+        observacao = request.POST.ger("observacao")
+
+        print(f"Procedimento selecionado: {procedimento}")
+        print(f"Número inserido: {numero}")
+        print(f"Tipo de Contrato: {tipo_contrato}")
+        print(f"Fornecedor: {fornecedor}")
+        print(f"NIF: {nif}")
+        print(f"Preço Contratual: {preco_contratual}")
+        print(f"Observação: {observacao}")
 
     return render(request, 'main/contrato_info.html', {
         'uploaded_file': uploaded_file,
@@ -131,6 +146,8 @@ def contrato_info(request, file_id):
         'data_final': data_final,
         'prazo': prazo,
         'preco_contratual': preco_contratual,
+        'observacao': observacao,
+        'anos_plurianual': anos_plurianual,  # Passar a lista de anos para o template
     })
 
     return render(request, 'main/contrato_info.html', {'uploaded_file': uploaded_file})
