@@ -85,15 +85,6 @@ select:focus {
     background-color: var(--primary-color);
 }
 
-a {
-    color: var(--primary-color);
-    text-decoration: none;
-    font-weight: bold;
-    margin-top: 2px;
-    display: block;
-    text-align: left;
-}
-
 a:hover {
     text-decoration: underline;
 }
@@ -143,62 +134,54 @@ input[readonly] {
     
 </head>
 <body>
-<h1>Informações do Contrato</h1>
-
-<p><strong>Nome do Contrato:</strong> {{ uploaded_file.name }}</p>
-
-<form method="POST" action="{% url 'contrato_info' file_id=uploaded_file.id %}">
-    {% csrf_token %}
-
-    <label for="procedimento"><strong>Procedimento:</strong></label>
-    <select id="procedimento" name="procedimento" style="margin-right: 20px;">
-        <option value="Consulta Prévia" {% if procedimento == "Consulta Prévia" %}selected{% endif %}>Consulta Prévia</option>
-        <option value="Ajuste Direto" {% if procedimento == "Ajuste Direto" %}selected{% endif %}>Ajuste Direto</option>
-        <option value="Concurso Público" {% if procedimento == "Concurso Público" %}selected{% endif %}>Concurso Público</option>
-    </select>
-
-    <label for="numero"><strong>Nº:</strong></label>
-    <input type="text" id="numero" name="numero" pattern="\d+" title="Apenas números" required value="{{ numero }}">
-
-    <br><br>
-
-    <label for="tipo_contrato"><strong>Tipo de Contrato:</strong></label>
-    <select id="tipo_contrato" name="tipo_contrato">
-        <option value="Bens" {% if tipo_contrato == "Bens" %}selected{% endif %}>Bens</option>
-        <option value="Serviços" {% if tipo_contrato == "Serviços" %}selected{% endif %}>Serviços</option>
-        <option value="Empreitada" {% if tipo_contrato == "Empreitada" %}selected{% endif %}>Empreitada</option>
-    </select>
-
-    <br><br>
-
-    <label for="fornecedor"><strong>Fornecedor:</strong></label>
-    <input type="text" id="nome" name="nome" size="60" required value="{{ fornecedor }}">
+    <h1>Informações do Contrato</h1>
     
-    <label for="nif"><strong>NIF:</strong></label>
-    <input type="text" id="nif" name="nif" pattern="\d{9}" maxlength="9" title="Apenas 9 números" required value="{{ nif }}">
-
-    <br><br>
-
-    <label for="data_inicial"><strong>Data Inicial:</strong></label>
-    <input type="date" id="data_inicial" name="data_inicial" style="margin-right: 20px;" required value="{{ data_inicial }}">
-
-    <label for="data_final"><strong>Data Final:</strong></label>
-    <input type="date" id="data_final" name="data_final" required value="{{ data_final }}">
-
-    <button type="submit" name="confirmar_datas" value="confirmar" class="btn-conf" id="btn-conf">Confirmar Datas</button>
-
-    <br><br>
-
-    <label for="prazo"><strong>Prazo:</strong></label>
-    <input type="text" id="prazo" name="prazo" size="20" readonly style="background-color: #e9ecef; margin-right: 15px;" value="{{ prazo }}">
-
-    <label for="preco_contratual"><strong>Preço Contratual:</strong></label>
-    <input type="text" id="preco_contratual" name="preco_contratual" size="18" required value="{{ preco_contratual }}">
-
-    <br><br>
-
-    <label for="observacao"><strong>Observações:</strong></label>
-    <input type="text" id="observacao" name="observacao" size="60">
+    <p style="text-align: center; font-weight: bold;">
+        {{ uploaded_file.name|slice:":-4"|title }}
+    </p>
+    
+    <form method="POST" action="{% url 'contrato_info' file_id=uploaded_file.id %}">
+        {% csrf_token %}
+        
+        <input type="hidden" name="user_id" value="{{ request.user.id }}">
+    
+        <label for="procedimento"><strong>Procedimento:</strong></label>
+        <select id="procedimento" name="procedimento">
+            <option value="Consulta Prévia" {% if procedimento == "Consulta Prévia" %}selected{% endif %}>Consulta Prévia</option>
+            <option value="Ajuste Direto" {% if procedimento == "Ajuste Direto" %}selected{% endif %}>Ajuste Direto</option>
+            <option value="Concurso Público" {% if procedimento == "Concurso Público" %}selected{% endif %}>Concurso Público</option>
+        </select>
+    
+        <label for="numero"><strong>Nº:</strong></label>
+        <input type="text" id="numero" name="numero" pattern="\d+" title="Apenas números" required value="{{ numero }}">
+    
+        <label for="tipo_contrato"><strong>Tipo de Contrato:</strong></label>
+        <select id="tipo_contrato" name="tipo_contrato">
+            <option value="Bens" {% if tipo_contrato == "Bens" %}selected{% endif %}>Bens</option>
+            <option value="Serviços" {% if tipo_contrato == "Serviços" %}selected{% endif %}>Serviços</option>
+            <option value="Empreitada" {% if tipo_contrato == "Empreitada" %}selected{% endif %}>Empreitada</option>
+        </select>
+    
+        <label for="fornecedor"><strong>Fornecedor:</strong></label>
+        <input type="text" id="nome" name="nome" required value="{{ fornecedor }}">
+        
+        <label for="nif"><strong>NIF:</strong></label>
+        <input type="text" id="nif" name="nif" pattern="\d{9}" maxlength="9" title="Apenas 9 números" required value="{{ nif }}">
+    
+        <label for="data_inicial"><strong>Data Inicial:</strong></label>
+        <input type="date" id="data_inicial" name="data_inicial" required value="{{ data_inicial }}">
+    
+        <label for="data_final"><strong>Data Final:</strong></label>
+        <input type="date" id="data_final" name="data_final" required value="{{ data_final }}">
+    
+        <label for="prazo"><strong>Prazo:</strong></label>
+        <input type="text" id="prazo" name="prazo" size="20" readonly style="background-color: #e9ecef; margin-right: 15px;" value="{{ prazo }}">
+    
+        <label for="preco_contratual"><strong>Preço Contratual:</strong></label>
+        <input type="text" id="preco_contratual" name="preco_contratual" required value="{{ preco_contratual }}">
+    
+        <label for="observacao"><strong>Observações:</strong></label>
+        <input type="text" id="observacao" name="observacao" size="60">
 
     <br><br>
 
@@ -224,11 +207,10 @@ input[readonly] {
 
     <br><br>
 
-    <label for="recorrente"><strong>Recorrente:</strong></label>
-    <select id="recorrente" name="recorrente" style="margin-right: 15px;">
-        <option value="Sim" {% if procedimento == "Sim" %}selected{% endif %}>Sim</option>
-        <option value="Não" {% if procedimento == "Não" %}selected{% endif %}>Não</option>
-        <option value="N/a" {% if procedimento == "N/a" %}selected{% endif %}>N/a</option>
+    <label for="compromisso"><strong>Compromisso:</strong></label>
+    <select id="compromisso" name="compromisso">
+        <option value="Sim">Sim</option>
+        <option value="Não">Não</option>
     </select>
 
     <label for="compromisso"><strong>Compromisso:</strong></label>
@@ -239,42 +221,38 @@ input[readonly] {
     <button type="submit" class="btn-salv" id="btn-salv">Salvar</button>
 </form>
 
-<a href="{% url 'contrato_info' file_id=uploaded_file.id %}">Voltar</a>
+<a href="/">Voltar</a>
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     const precoInput = document.getElementById('preco_contratual');
 
     precoInput.addEventListener('input', function (event) {
-        let value = precoInput.value;
+        let value = precoInput.value.replace(/[^\d,]/g, '');
 
-        // Remove all non-digit and non-comma characters
-        value = value.replace(/[^\d,]/g, '');
-
-        // Ensure only one comma is allowed
         if ((value.match(/,/g) || []).length > 1) {
             value = value.replace(/,/g, '');
         }
 
         let parts = value.split(',');
-        // Add thousand separators
         parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, '.');
 
-        precoInput.value = parts.join(',');
-
-        // Only append '€' if the value is not empty
-        if (precoInput.value !== '' && !precoInput.value.includes('€')) {
-            precoInput.value += ' €';
+        let formattedValue = parts.join(',');
+        if (formattedValue !== '') {
+            formattedValue += ' €';
         }
+        precoInput.value = formattedValue;
+
+        setTimeout(() => {
+            precoInput.setSelectionRange(formattedValue.length - 2, formattedValue.length - 2);
+        }, 0);
     });
 
     precoInput.addEventListener('focus', function () {
-        // Remove '€' symbol when the field is focused
         precoInput.value = precoInput.value.replace(' €', ''); 
     });
 
     precoInput.addEventListener('blur', function () {
-        // Append '€' symbol when the field loses focus, only if it's not empty
         if (precoInput.value !== '' && !precoInput.value.includes('€')) {
             precoInput.value += ' €';
         }
@@ -284,64 +262,79 @@ document.addEventListener('DOMContentLoaded', function () {
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-    const valorEntregueInput = document.getElementById('valor_entregue');
-
-    valorEntregueInput.addEventListener('input', function (event) {
-        let value = valorEntregueInput.value;
-
-        // Remove all non-digit and non-comma characters
-        value = value.replace(/[^\d,]/g, '');
-
-        // Ensure only one comma is allowed
-        if ((value.match(/,/g) || []).length > 1) {
-            value = value.replace(/,/g, '');
-        }
-
-        let parts = value.split(',');
-        // Add thousand separators
-        parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-
-        valorEntregueInput.value = parts.join(',');
-
-        // Only append '€' if the value is not empty
-        if (valorEntregueInput.value !== '' && !valorEntregueInput.value.includes('€')) {
-            valorEntregueInput.value += ' €';
-        }
-    });
-
-    valorEntregueInput.addEventListener('focus', function () {
-        // Remove '€' symbol when the field is focused
-        valorEntregueInput.value = valorEntregueInput.value.replace(' €', ''); 
-    });
-
-    valorEntregueInput.addEventListener('blur', function () {
-        // Append '€' symbol when the field loses focus, only if it's not empty
-        if (valorEntregueInput.value !== '' && !valorEntregueInput.value.includes('€')) {
-            valorEntregueInput.value += ' €';
-        }
-    });
-});
-    </script>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const confirmButton = document.getElementById('btn-conf');
-            const form = document.querySelector('form');
-            const dataInicial = document.getElementById('data_inicial');
-            const dataFinal = document.getElementById('data_final');
-        
-            confirmButton.addEventListener('click', function (event) {
-                if (dataInicial.value === '' || dataFinal.value === '') {
-                    alert('Por favor, preencha as datas inicial e final.');
-                } else {
-                    document.querySelectorAll('input, select').forEach(function (input) {
-                        if (input !== dataInicial && input !== dataFinal) {
-                            input.removeAttribute('required');
-                        }
-                    });
-                }
-            });
+        const valorEntregueInput = document.getElementById('valor_entregue');
+    
+        valorEntregueInput.addEventListener('input', function (event) {
+            let value = valorEntregueInput.value.replace(/[^\d,]/g, '');
+    
+            if ((value.match(/,/g) || []).length > 1) {
+                value = value.replace(/,/g, '');
+            }
+    
+            let parts = value.split(',');
+            
+            parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    
+            let formattedValue = parts.join(',');
+            if (formattedValue !== '') {
+                formattedValue += ' €';
+            }
+            valorEntregueInput.value = formattedValue;
+    
+            setTimeout(() => {
+                valorEntregueInput.setSelectionRange(formattedValue.length - 2, formattedValue.length - 2);
+            }, 0);
         });
-        </script>
+    
+        valorEntregueInput.addEventListener('focus', function () {
+            
+            valorEntregueInput.value = valorEntregueInput.value.replace(' €', ''); 
+        });
+    
+        valorEntregueInput.addEventListener('blur', function () {
+            
+            if (valorEntregueInput.value !== '' && !valorEntregueInput.value.includes('€')) {
+                valorEntregueInput.value += ' €';
+            }
+        });
+    });
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const dataInicial = document.getElementById('data_inicial');
+        const dataFinal = document.getElementById('data_final');
+        const prazoInput = document.getElementById('prazo');
+    
+        function calcularPrazo() {
+            const inicial = new Date(dataInicial.value);
+            const final = new Date(dataFinal.value);
+            if (!isNaN(inicial) && !isNaN(final)) {
+                const diferenca = final - inicial;
+                const totalDias = Math.ceil(diferenca / (1000 * 60 * 60 * 24));
+                const anos = Math.floor(totalDias / 365);
+                const meses = Math.floor((totalDias % 365) / 30);
+                const diasRestantes = totalDias - (anos * 365 + meses * 30);
+    
+                let partes = [];
+                if (anos > 0) partes.push(`${anos} ${anos === 1 ? 'ano' : 'anos'}`);
+                if (meses > 0) partes.push(`${meses} ${meses === 1 ? 'mês' : 'meses'}`);
+                if (diasRestantes > 0) partes.push(`${diasRestantes} ${diasRestantes === 1 ? 'dia' : 'dias'}`);
+    
+                if (partes.length > 1) {
+                    const ultimaParte = partes.pop();
+                    prazoInput.value = partes.join(', ') + ' e ' + ultimaParte;
+                } else {
+                    prazoInput.value = partes.join(', ') || '0 dias';
+                }
+            } else {
+                prazoInput.value = '';
+            }
+        }
+    
+        dataInicial.addEventListener('input', calcularPrazo);
+        dataFinal.addEventListener('input', calcularPrazo);
+    });
+</script>
 
 {% endblock %}

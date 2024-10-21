@@ -25,3 +25,23 @@ class UploadedFile(models.Model):
 
     def __str__(self):
         return self.name
+	
+class Contract(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    procedimento = models.CharField(max_length=255)
+    numero = models.CharField(max_length=100)
+    tipo_contrato = models.CharField(max_length=100)
+    fornecedor = models.CharField(max_length=255)
+    nif = models.CharField(max_length=100)
+    data_inicial = models.DateField()
+    data_final = models.DateField()
+    prazo = models.CharField(max_length=255)  # Ou use um modelo diferente para armazenar isso
+    preco_contratual = models.DecimalField(max_digits=10, decimal_places=2)
+    observacao = models.TextField(blank=True, null=True)
+    valor_entregue = models.DecimalField(max_digits=10, decimal_places=2)
+    recorrente = models.BooleanField(default=False)
+    compromisso = models.BooleanField(default=False)
+    uploaded_file = models.ForeignKey(UploadedFile, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"{self.numero} - {self.fornecedor}"

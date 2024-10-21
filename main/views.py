@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpResponseRedirect
-from .models import ToDoList, Item, UploadedFile
+from .models import ToDoList, Item, UploadedFile, Contract
 from .forms import CreateNewList
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
@@ -90,90 +90,38 @@ def gerar_plurianual(data_inicial, data_final):
 def contrato_info(request, file_id):
     uploaded_file = UploadedFile.objects.get(id=file_id, user=request.user)
     
-    procedimento = ""
-    numero = ""
-    tipo_contrato = ""
-    fornecedor = ""
-    nif = ""
-    data_inicial = ""
-    data_final = ""
-    prazo = ""
-    preco_contratual = ""
-    observacao = ""
-    anos_plurianual = []
-    valor_entregue = ""
-    recorrente = ""
-    compromisso = ""
-    
     if request.method == "POST":
+        procedimento = request.POST.get("procedimento", "")
+        numero = request.POST.get("numero", "")
+        tipo_contrato = request.POST.get("tipo_contrato", "")
+        fornecedor = request.POST.get("nome", "")
+        nif = request.POST.get("nif", "")
         data_inicial = request.POST.get("data_inicial", "")
         data_final = request.POST.get("data_final", "")
-
-        if "confirmar_datas" in request.POST and data_inicial and data_final:
-            prazo = calcular_diferenca(data_inicial, data_final)
-            anos_plurianual = gerar_plurianual(data_inicial, data_final)
-
-        procedimento = request.POST.get("procedimento", "")
-        numero = request.POST.get("numero", "")
-        tipo_contrato = request.POST.get("tipo_contrato", "")
-        fornecedor = request.POST.get("nome", "")
-        nif = request.POST.get("nif", "")
+        preco_contratual = request.POST.get("preco_contratual", "").replace('€', '').strip()
         observacao = request.POST.get("observacao", "")
-        recorrente = request.POST.get ("recorrente", "")
-        compromisso = request.POST.get ("compromisso", "")
-
-        preco_contratual = request.POST.get("preco_contratual", "")
-        if preco_contratual:
-            preco_contratual = preco_contratual.replace('€', '').strip()
-
-        valor_entregue = request.POST.get("valor_entregue", "")
-        if valor_entregue:
-            valor_entregue = valor_entregue.replace('€', '').strip()
+        valor_entregue = request.POST.get("valor_entregue", "").replace('€', '').strip()
+        recorrente = request.POST.get("recorrente") == "Sim"
+        compromisso = request.POST.get("compromisso") == "Sim"
+        prazo = calcular_diferenca(data_inicial, data_final)
         
-    else:
-        procedimento = request.POST.get("procedimento", "")
-        numero = request.POST.get("numero", "")
-        tipo_contrato = request.POST.get("tipo_contrato", "")
-        fornecedor = request.POST.get("nome", "")
-        nif = request.POST.get("nif", "")
-        observacao = request.POST.get("observacao", "")
-        recorrente = request.POST.get ("recorrente", "")
-        compromisso = request.POST.get ("compromisso", "")
-
-        preco_contratual = request.POST.get("preco_contratual", "")
-        if preco_contratual:
-            preco_contratual = preco_contratual.replace('€', '').strip()
-
-        valor_entregue = request.POST.get("valor_entregue", "")
-        if valor_entregue:
-            valor_entregue = valor_entregue.replace('€', '').strip()
-        print(f"Procedimento selecionado: {procedimento}")
-        print(f"Número inserido: {numero}")
-        print(f"Tipo de Contrato: {tipo_contrato}")
-        print(f"Fornecedor: {fornecedor}")
-        print(f"NIF: {nif}")
-        print(f"Preço Contratual: {preco_contratual}")
-        print(f"Observações: {observacao}")
-        print(f"Valor Entregue: {valor_entregue}")
-        print(f"Recorrente: {recorrente}")
-        print(f"Compromisso: {compromisso}")
-
-    return render(request, 'main/contrato_info.html', {
-        'uploaded_file': uploaded_file,
-        'procedimento': procedimento,
-        'numero': numero,
-        'tipo_contrato': tipo_contrato,
-        'fornecedor': fornecedor,
-        'nif': nif,
-        'data_inicial': data_inicial,
-        'data_final': data_final,
-        'prazo': prazo,
-        'preco_contratual': preco_contratual,
-        'observacao': observacao,
-        'anos_plurianual': anos_plurianual,
-        'valor_entregue' : valor_entregue,
-        'recorrente' : recorrente,
-        'compromisso' : compromisso,
-    })
-
+        contract = Contract(
+            user=request.user,
+            procedimento=procedimento,
+            numero=numero,
+            tipo_contrato=tipo_contrato,
+            fornecedor=fornecedor,
+            nif=nif,
+            data_inicial=data_inicial,
+            data_final=data_final,
+            prazo=prazo,
+            preco_contratual=preco_contratual,
+            observacao=observacao,
+            valor_entregue=valor_entregue,
+            recorrente=recorrente,
+            compromisso=compromisso,
+            uploaded_file=uploaded_file,
+            )
+        contract.save()
+        return redirect('admin:main_contract_changelist')
     return render(request, 'main/contrato_info.html', {'uploaded_file': uploaded_file})
