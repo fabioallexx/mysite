@@ -16,7 +16,7 @@ def index(response, id):
                     if response.POST.get("c" + str(item.id)) == "clicked":
                         item.complete = True
                     else:
-                        item.complete =False
+                        item.complete = False
                     item.save()
             elif response.POST.get("newItem"):
                 txt = response.POST.get("new")
@@ -25,11 +25,12 @@ def index(response, id):
                 else:
                     print("invalid")
 
-        return render(response, 'main/list.html', {"ls":ls})
-    return render(response, 'main/view.html', {"ls":ls})
+        return render(response, 'main/list.html', {"ls": ls, "tem_contrato": Contract.objects.filter(user=response.user).exists()})
+    return render(response, 'main/view.html', {"ls": ls})
 
-def home(response):
-    return render(response, 'main/home.html', {})
+def home(request):
+    context = get_global_context(request)
+    return render(request, 'main/home.html', context)
 
 def create(response):
     if response.method == "POST":
@@ -89,7 +90,8 @@ def gerar_plurianual(data_inicial, data_final):
 
 def contrato_info(request, file_id):
     uploaded_file = UploadedFile.objects.get(id=file_id, user=request.user)
-    
+    tem_contrato = Contract.objects.filter(user=request.user).exists() if request.user.is_authenticated else False
+    contract = Contract.objects.filter(uploaded_file=uploaded_file, user=request.user).first()
     if request.method == "POST":
         procedimento = request.POST.get("procedimento", "")
         numero = request.POST.get("numero", "")
@@ -98,30 +100,81 @@ def contrato_info(request, file_id):
         nif = request.POST.get("nif", "")
         data_inicial = request.POST.get("data_inicial", "")
         data_final = request.POST.get("data_final", "")
-        preco_contratual = request.POST.get("preco_contratual", "").replace('€', '').strip()
+        preco_contratual_str = request.POST.get("preco_contratual", "").replace('€', '').replace('.', '').replace(',', '.').strip()
+        valor_entregue_str = request.POST.get("valor_entregue", "").replace('€', '').replace('.', '').replace(',', '.').strip()
+        preco_contratual = float(preco_contratual_str) if preco_contratual_str else 0.0
+        valor_entregue = float(valor_entregue_str) if valor_entregue_str else 0.0
         observacao = request.POST.get("observacao", "")
-        valor_entregue = request.POST.get("valor_entregue", "").replace('€', '').strip()
         recorrente = request.POST.get("recorrente") == "Sim"
         compromisso = request.POST.get("compromisso") == "Sim"
         prazo = calcular_diferenca(data_inicial, data_final)
         
-        contract = Contract(
-            user=request.user,
-            procedimento=procedimento,
-            numero=numero,
-            tipo_contrato=tipo_contrato,
-            fornecedor=fornecedor,
-            nif=nif,
-            data_inicial=data_inicial,
-            data_final=data_final,
-            prazo=prazo,
-            preco_contratual=preco_contratual,
-            observacao=observacao,
-            valor_entregue=valor_entregue,
-            recorrente=recorrente,
-            compromisso=compromisso,
-            uploaded_file=uploaded_file,
+        if contract:
+            contract.procedimento = procedimento
+            contract.numero = numero
+            contract.tipo_contrato = tipo_contrato
+            contract.fornecedor = fornecedor
+            contract.nif = nif
+            contract.data_inicial = data_inicial
+            contract.data_final = data_final
+            contract.prazo = prazo
+            contract.preco_contratual = preco_contratual
+            contract.observacao = observacao
+            contract.valor_entregue = valor_entregue
+            contract.recorrente = recorrente
+            contract.compromisso = compromisso
+            contract.save()
+        else:
+            contract = Contract(
+                user=request.user,
+                procedimento=procedimento,
+                numero=numero,
+                tipo_contrato=tipo_contrato,
+                fornecedor=fornecedor,
+                nif=nif,
+                data_inicial=data_inicial,
+                data_final=data_final,
+                prazo=prazo,
+                preco_contratual=preco_contratual,
+                observacao=observacao,
+                valor_entregue=valor_entregue,
+                recorrente=recorrente,
+                compromisso=compromisso,
+                uploaded_file=uploaded_file,
             )
-        contract.save()
+            contract.save()
         return redirect('admin:main_contract_changelist')
-    return render(request, 'main/contrato_info.html', {'uploaded_file': uploaded_file})
+    return render(request, 'main/contrato_info.html', {
+        'uploaded_file': uploaded_file,
+        "tem_contrato": tem_contrato,
+        "contract": contract,
+        "procedimento": contract.procedimento if contract else '',
+        "numero": contract.numero if contract else '',
+        "tipo_contrato": contract.tipo_contrato if contract else '',
+        "fornecedor": contract.fornecedor if contract else '',
+        "nif": contract.nif if contract else '',
+        "data_inicial": contract.data_inicial if contract else '',
+        "data_final": contract.data_final if contract else '',
+        "prazo": contract.prazo if contract else '',
+        "preco_contratual": contract.preco_contratual if contract else '',
+        "observacao": contract.observacao if contract else '',
+        "valor_entregue": contract.valor_entregue if contract else '',
+        "recorrente": 'Sim' if contract and contract.recorrente else 'Não',
+        "compromisso": 'Sim' if contract and contract.compromisso else 'Não'
+    })
+
+def get_global_context(request):
+    return {
+        'tem_contrato': Contract.objects.filter(user=request.user).exists() if request.user.is_authenticated else False,
+        'is_contrato_detalhes': request.path.startswith('/contrato/detalhes/')
+    }
+
+def caderno_encargos(request):
+    # Lógica para a página do caderno de encargos
+    return render(request, 'main/caderno_encargos.html')
+
+def contrato_detalhes(request, contract_id):
+    contract = Contract.objects.get(id=contract_id, user=request.user)
+    context = {'contract': contract}
+    context.update(get_global_context(request))
+    return render(request, 'main/contrato_detalhes.html', context)

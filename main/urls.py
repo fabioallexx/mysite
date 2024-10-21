@@ -10,4 +10,6 @@ urlpatterns = [
     path('view/', views.view, name='view'),
     path('upload/', views.upload_file, name='upload_file'),
     path('contrato_info/<int:file_id>/', views.contrato_info, name='contrato_info'),
+    path('caderno-encargos/', views.caderno_encargos, name='caderno_encargos'),
+    path('contrato/detalhes/<int:contract_id>/', views.contrato_detalhes, name='contrato_detalhes'),
 ]

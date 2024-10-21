@@ -124,7 +124,10 @@
         <a href="/">Contratos Ativos</a>
         <a href="/create">Create</a>
         <a href="/view">View</a>
-        <a href="/">Caderno Encargos</a>
+        
+        {% if is_contrato_detalhes and user.is_authenticated %}
+        <a href="{% url 'caderno_encargos' %}">Caderno Encargos</a>
+        {% endif %}
 
         <div style="position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);">
             {% if user.is_authenticated %}

@@ -202,7 +202,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const precoInput = document.getElementById('preco_contratual');
 
     precoInput.addEventListener('input', function (event) {
-        let value = precoInput.value.replace(/[^\d,]/g, '');
+        let value = precoInput.value.replace(/[^\d,€]/g, '').replace('€', '').trim();
 
         if ((value.match(/,/g) || []).length > 1) {
             value = value.replace(/,/g, '');

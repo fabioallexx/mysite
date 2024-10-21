@@ -1,0 +1,52 @@
+{% extends 'main/base.html' %}
+{% load humanize %}
+{% block content %}
+<h1>Detalhes do Contrato</h1>
+
+<p><strong>Procedimento:</strong> {{ contract.procedimento }}</p>
+<p><strong>Nº:</strong> {{ contract.numero }}</p>
+<p><strong>Tipo de Contrato:</strong> {{ contract.tipo_contrato }}</p>
+<p><strong>Fornecedor:</strong> {{ contract.fornecedor }}</p>
+<p><strong>NIF:</strong> {{ contract.nif }}</p>
+<p><strong>Data Inicial:</strong> {{ contract.data_inicial }}</p>
+<p><strong>Data Final:</strong> {{ contract.data_final }}</p>
+<p><strong>Prazo:</strong> <span id="prazo">{{ contract.prazo }}</span> <span id="prazo-icon"></span></p>
+<p><strong>Preço Contratual:</strong> {{ contract.preco_contratual|floatformat:0|intcomma }} €</p>
+<p><strong>Observações:</strong> {{ contract.observacao }}</p>
+<p><strong>Valor Entregue:</strong> {{ contract.valor_entregue|floatformat:0|intcomma }} €</p>
+<p><strong>Recorrente:</strong> {{ contract.recorrente|yesno:"Sim,Não" }}</p>
+<p><strong>Compromisso:</strong> {{ contract.compromisso|yesno:"Sim,Não" }}</p>
+
+<a href="{% url 'contrato_info' file_id=contract.uploaded_file.id %}">Editar</a>
+<a href="/">Voltar</a>
+
+<script>
+    const dataInicial = new Date("{{ contract.data_inicial|date:'Y-m-d' }}").getTime();
+    const dataFinal = new Date("{{ contract.data_final|date:'Y-m-d' }}").getTime();
+    
+    function updatePrazo() {
+        const agora = Date.now();
+        const totalDuration = dataFinal - dataInicial;
+        const elapsed = agora - dataInicial;
+        const percentage = (elapsed / totalDuration) * 100;
+
+        const prazoIcon = document.getElementById('prazo-icon');
+        
+        prazoIcon.innerHTML = '';
+
+        if (percentage >= 75) {
+            prazoIcon.innerHTML = '🔴'; // Exemplo de ícone para 75% ou mais
+        } else if (percentage >= 50) {
+            prazoIcon.innerHTML = '🟡'; // Exemplo de ícone para 50% ou mais
+        } else if (percentage >= 25) {
+            prazoIcon.innerHTML = '🟢'; // Exemplo de ícone para 25% ou mais
+        } else {
+            prazoIcon.innerHTML = '⚪'; // Exemplo de ícone para menos de 25%
+        }
+    }
+
+    // Atualizar a cada segundo
+    setInterval(updatePrazo, 1000);
+    updatePrazo();
+</script>
+{% endblock %}

@@ -5,11 +5,15 @@
 <div>
     <ul style="list-style-type: disc; padding-left: 20px;">
         {% for uf in user.uploadedfile.all %}
-            <li>
-                <a href="{% url 'contrato_info' file_id=uf.id %}">
-                    {{ uf.name }}
+        <li>
+            {% with contract=uf.contract_set.first %}
+                <a href="{% if contract %}{% url 'contrato_detalhes' contract.id %}{% else %}{% url 'contrato_info' file_id=uf.id %}{% endif %}">
+                    <span style="font-weight: bold; font-size: 1.1em;">
+                        {{ uf.name|slice:":-4"|capfirst }}  {# Remove a extensão do arquivo e capitaliza a primeira letra #}
+                    </span>
                 </a>
-            </li>
+            {% endwith %}
+        </li>
         {% empty %}
             <li>Nenhum contrato carregado.</li>
         {% endfor %}
