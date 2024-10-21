@@ -8,130 +8,137 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Informações do Contrato</title>
     <style>
-    /* Cores */
-    :root {
-        --color1: #387788; /* Verde escuro */
-        --color2: #518fa1; /* Azul médio */
-        --color3: #69a7b9; /* Azul claro */
-        --color4: #82bfd2; /* Azul muito claro */
-        --color5: #9ad7ea; /* Azul quase branco */
-    }
+:root {
+    --primary-color: #1e3a8a; 
+    --secondary-color: #2563eb;
+    --accent-color: #60a5fa; 
+    --background-color: #f3f4f6; 
+    --text-color: #111827; 
+    --light-gray: #e5e7eb;
+    --white: #ffffff;
+}
 
-   /* Estilo do corpo */
-   body {
-        font-family: Arial, sans-serif;
-        background-color: var(--color5);
-        color: var(--color1);
-        margin: 0;
-        padding: 20px;
-    }
+body {
+    font-family: 'Open Sans', sans-serif;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    margin: 0;
+    padding: 20px;
+}
 
-     /* Títulos */
-     h1 {
-        color: var(--color1);
-        margin-bottom: 20px;
-        text-align: center;
-    }
+h1 {
+    color: var(--primary-color);
+    font-size: 2rem;
+    margin-bottom: 20px;
+    text-align: center;
+    font-weight: 700;
+}
 
-    /* Formulários */
-    form {
-        background-color: var(--color4);
-        border-radius: 10px; 
-        padding: 3px; 
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-        max-width: 1000px; /* Limitar largura do formulário */
-        margin: auto; /* Centralizar o formulário */
-    }
+form {
+    border-radius: 8px;
+    padding: 30px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    max-width: 950px;
+    margin: auto;
+}
 
-     /* Labels */
-     label {
-        font-weight: bold;
-        color: var(--color2);
-        margin-bottom: 5px;
-    }
+label {
+    font-weight: 600;
+    color: var(--primary-color);
+    margin-bottom: 10px;
+    display: inline-block;
+}
 
-    /* Inputs e Selects */
+input[type="text"],
+input[type="date"],
+select {
+    width: calc(100% - 20px);
+    padding: 10px;
+    border: 1px solid var(--light-gray);
+    border-radius: 8px;
+    margin-bottom: 10px;
+    background-color: var(--white);
+    transition: box-shadow 0.3s, border-color 0.3s;
+    font-size: 1rem;
+}
+
+input[type="text"]:focus,
+input[type="date"]:focus,
+select:focus {
+    border-color: var(--secondary-color);
+    box-shadow: 0 0 8px rgba(37, 99, 235, 0.3);
+    outline: none;
+}
+
+.btn-salv, .btn-conf {
+    background-color: var(--secondary-color);
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background-color 0.3s;
+}
+
+.btn-salv:hover, .btn-conf:hover {
+    background-color: var(--primary-color);
+}
+
+a {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: bold;
+    margin-top: 2px;
+    display: block;
+    text-align: left;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+.alert-container {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 30px;
+}
+
+.alert-box {
+    border: 1px solid var(--light-gray);
+    border-radius: 10px;
+    padding: 15px;
+    flex: 1;
+    margin-right: 10px;
+    background-color: var(--accent-color);
+    color: var(--white);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+
+.alert-box:last-child {
+    margin-right: 0;
+}
+
+input[readonly] {
+    background-color: var(--light-gray);
+    border-color: var(--light-gray);
+}
+
+@media (max-width: 768px) {
     input[type="text"],
     input[type="date"],
     select {
-        width: 30%;
-        padding: 3px;
-        border: 1px solid var(--color3);
-        border-radius: 20px;
-        margin-bottom: 5px;
-        background-color: white;
-        transition: border-color 0.3s;
+        width: 100%;
     }
 
-    input[type="text"]:focus,
-    input[type="date"]:focus,
-    select:focus {
-        border-color: var(--color2);
+    form {
+        padding: 20px;
     }
 
-    .btn-salv {
-        background-color: var(--color2);
-        color: white;
-        padding: 8px;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        transition: background-color 0.3s;
-    }
-
-    .btn-salv:hover {
-        background-color: var(--color1);
-    }
-
-     /* Botões */
-     .btn-conf {
-        background-color: var(--color2);
-        color: white;
-        padding: 8px;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        transition: background-color 0.3s;
-    }
-
-    .btn-conf:hover {
-        background-color: var(--color1);
-    }
-
-    /* Links */
-    a {
-        color: var(--color1);
-        text-decoration: none;
-        margin-top: 10px;
-        display: inline-block;
-        text-align: left; /* Centralizar o texto do link */
-    }
-
-    a:hover {
-        text-decoration: underline;
-    }
-
-    /* Divs para alertas */
     .alert-container {
-        display: flex;
-        justify-content: space-between;
-        margin-bottom: 30px;
+        flex-direction: column;
     }
-
-    .alert-box {
-        border: 1px solid var(--color3);
-        border-radius: 5px;
-        padding: 10px;
-        flex: 1;
-        margin-right: 10px;
-        background-color: var(--color4);
-    }
-
-    /* Remover margem do último alert-box */
-    .alert-box:last-child {
-        margin-right: 0;
-    }
-
+}
     </style>
     
 </head>
@@ -167,7 +174,7 @@
     <label for="fornecedor"><strong>Fornecedor:</strong></label>
     <input type="text" id="nome" name="nome" size="60" required value="{{ fornecedor }}">
     
-    <label for="nif" style="margin-left: 35px;"><strong>NIF:</strong></label>
+    <label for="nif"><strong>NIF:</strong></label>
     <input type="text" id="nif" name="nif" pattern="\d{9}" maxlength="9" title="Apenas 9 números" required value="{{ nif }}">
 
     <br><br>
@@ -185,13 +192,13 @@
     <label for="prazo"><strong>Prazo:</strong></label>
     <input type="text" id="prazo" name="prazo" size="20" readonly style="background-color: #e9ecef; margin-right: 15px;" value="{{ prazo }}">
 
-    <label for="preco_contratual" style="margin-left: 50px;"><strong>Preço Contratual:</strong></label>
+    <label for="preco_contratual"><strong>Preço Contratual:</strong></label>
     <input type="text" id="preco_contratual" name="preco_contratual" size="18" required value="{{ preco_contratual }}">
 
     <br><br>
 
     <label for="observacao"><strong>Observações:</strong></label>
-    <input type="text" id="observacao" name="observacao" size="60" required value="{{ observacao }}">
+    <input type="text" id="observacao" name="observacao" size="60">
 
     <br><br>
 
@@ -241,27 +248,33 @@ document.addEventListener('DOMContentLoaded', function () {
     precoInput.addEventListener('input', function (event) {
         let value = precoInput.value;
 
+        // Remove all non-digit and non-comma characters
         value = value.replace(/[^\d,]/g, '');
 
+        // Ensure only one comma is allowed
         if ((value.match(/,/g) || []).length > 1) {
             value = value.replace(/,/g, '');
         }
 
         let parts = value.split(',');
+        // Add thousand separators
         parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, '.');
 
         precoInput.value = parts.join(',');
 
+        // Only append '€' if the value is not empty
         if (precoInput.value !== '' && !precoInput.value.includes('€')) {
             precoInput.value += ' €';
         }
     });
 
     precoInput.addEventListener('focus', function () {
+        // Remove '€' symbol when the field is focused
         precoInput.value = precoInput.value.replace(' €', ''); 
     });
 
     precoInput.addEventListener('blur', function () {
+        // Append '€' symbol when the field loses focus, only if it's not empty
         if (precoInput.value !== '' && !precoInput.value.includes('€')) {
             precoInput.value += ' €';
         }
@@ -271,37 +284,64 @@ document.addEventListener('DOMContentLoaded', function () {
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        const precoInput = document.getElementById('valor_entregue');
-    
-        precoInput.addEventListener('input', function (event) {
-            let value = precoInput.value;
-    
-            value = value.replace(/[^\d,]/g, '');
-    
-            if ((value.match(/,/g) || []).length > 1) {
-                value = value.replace(/,/g, '');
-            }
-    
-            let parts = value.split(',');
-            parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-    
-            precoInput.value = parts.join(',');
-    
-            if (precoInput.value !== '' && !precoInput.value.includes('€')) {
-                precoInput.value += ' €';
-            }
-        });
-    
-        precoInput.addEventListener('focus', function () {
-            precoInput.value = precoInput.value.replace(' €', ''); 
-        });
-    
-        precoInput.addEventListener('blur', function () {
-            if (precoInput.value !== '' && !precoInput.value.includes('€')) {
-                precoInput.value += ' €';
-            }
-        });
+    const valorEntregueInput = document.getElementById('valor_entregue');
+
+    valorEntregueInput.addEventListener('input', function (event) {
+        let value = valorEntregueInput.value;
+
+        // Remove all non-digit and non-comma characters
+        value = value.replace(/[^\d,]/g, '');
+
+        // Ensure only one comma is allowed
+        if ((value.match(/,/g) || []).length > 1) {
+            value = value.replace(/,/g, '');
+        }
+
+        let parts = value.split(',');
+        // Add thousand separators
+        parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+
+        valorEntregueInput.value = parts.join(',');
+
+        // Only append '€' if the value is not empty
+        if (valorEntregueInput.value !== '' && !valorEntregueInput.value.includes('€')) {
+            valorEntregueInput.value += ' €';
+        }
     });
+
+    valorEntregueInput.addEventListener('focus', function () {
+        // Remove '€' symbol when the field is focused
+        valorEntregueInput.value = valorEntregueInput.value.replace(' €', ''); 
+    });
+
+    valorEntregueInput.addEventListener('blur', function () {
+        // Append '€' symbol when the field loses focus, only if it's not empty
+        if (valorEntregueInput.value !== '' && !valorEntregueInput.value.includes('€')) {
+            valorEntregueInput.value += ' €';
+        }
+    });
+});
     </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const confirmButton = document.getElementById('btn-conf');
+            const form = document.querySelector('form');
+            const dataInicial = document.getElementById('data_inicial');
+            const dataFinal = document.getElementById('data_final');
+        
+            confirmButton.addEventListener('click', function (event) {
+                if (dataInicial.value === '' || dataFinal.value === '') {
+                    alert('Por favor, preencha as datas inicial e final.');
+                } else {
+                    document.querySelectorAll('input, select').forEach(function (input) {
+                        if (input !== dataInicial && input !== dataFinal) {
+                            input.removeAttribute('required');
+                        }
+                    });
+                }
+            });
+        });
+        </script>
 
 {% endblock %}
