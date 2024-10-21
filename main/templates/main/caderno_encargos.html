@@ -1,0 +1,67 @@
+{% extends 'main/base.html' %}
+{% block content %}
+
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <h1>Relatório de Gestão de Contrato</h1>
+
+    <body>
+        <h2>Identificação do Contrato</h2>
+
+        <label for="procedimento_n"><strong>Procedimento Aquisitivo Nº:</strong></label>
+        <input type="text" id="procedimento_n" name="procedimento_n" readonly style="background-color: #e9ecef"; required value="{{ procedimento_n }}">
+
+        <h2>Objeto do Contrato</h2>
+
+        <label for="contrato_celebrado"><strong>Contrato Celebrado em:</strong></label>
+        <input type="text" id="contrato_celebrado" name="contrato_celebrado" readonly style="background-color: #e9ecef"; required value="{{ contrato_celebrado }}">
+
+        <label for="periodo_vigencia"><strong>Período de Vigência:</strong></label>
+        <input type="text" id="periodo_vigencia" name="periodo_vigencia" readonly style="background-color: #e9ecef"; required value="{{ periodo_vigencia }}">
+
+        <label for="valor_contrato"><strong>Valor do Contrato:</strong></label>
+        <input type="text" id="valor_contrato" name="valor_contrato" readonly style="background-color: #e9ecef"; required value="{{ valor_contrato }}">
+
+        <label for="fornecedor"><strong>Fornecedor:</strong></label>
+        <input type="text" id="fornecedor" name="fornecedor" readonly style="background-color: #e9ecef"; required value="{{ fornecedor }}">
+
+        <label for="nif"><strong>NIF:</strong></label>
+        <input type="text" id="nif" name="nif" readonly style="background-color: #e9ecef"; required value="{{ nif }}">
+
+        <h2>Avaliação dos Serviços Executados</h2>
+
+        <label for="cumprimento_prazo"><strong>CUMPRIMENTO DO PRAZO (Entrega/execução dentro do(s) prazo(s), de acordo com o estabelicimento no contrato/proposta/CE)</strong></label>
+        <input type="radio" id="sim" name="fav_language" value="sim">
+        <label for="sim">Sim</label><br>
+        <input type="radio" id="nao" name="fav_language" value="nao">
+        <label for="nao">Não</label><br>
+
+        <label for="incumprimento_prazo"><strong>Em caso de incumprimento de prazo, foi solicitado o acionamento de penalidades contratuais?</strong></label>
+        <input type="radio" id="sim" name="fav_language" value="sim">
+        <label for="sim">Sim</label><br>
+        <input type="radio" id="nao" name="fav_language" value="nao">
+        <label for="nao">Não</label><br>
+
+        <label for="justificar_prazo"><strong>Em caso negativo, justificar a opção/decisão:</strong></label>
+        <input type="text" id="justificar_prazo" name="justificar_prazo" required value="{{ justificar_prazo }}">
+
+        <label for="conformidade_contratado"><strong>CONFORMIDADE DO CONTRATADO - cumprimento das obrigações contratuais principais (conferência do bem/serviço/empreitada tendo em
+        conta os dados constantes no contrato/proposta/CE/projeto de execução, nomeadamente a referência/descrição do bem/serviço/empreitada e a respeitva quantidade, bem como,
+        a conformidade das características dos bens/serviços/empreitadas com os requisitos técnicos e funcionais pré-definidos, condições do seu acondicionamento e/ou qualidade
+        dos resultados apresentados face aos objetivos definidos em termos de cumprimento dos níveis de serviço acordados)</strong></label>
+
+        <label for="defeitos"><strong>Desvios, Defeitos ou Anomalias detetadas na execução do contrato:</strong></label>
+        <input type="text" id="defeitos" name="defeitos" required value="{{ defeitos }}">
+
+        <label for="sugestoes"><strong>Observações/Sugestões/Comentários sobre a execução do contrato que entenda por pertinente:</strong></label>
+        <input type="text" id="sugestoes" name="sugestoes" required value="{{ sugestoes }}">
+
+        <label for="nota"><strong>Nota:</strong></label>
+        <label for="nota_ctn"><strong>O gestor do contrato deve remeter o presente relatório via email para o Gabinete de Aprovisionamento gab.aprovisionamento@cm-moita.pt no prazo
+        máximo de 10 dias úteis após a conferencia/validação da ultima fatura do contrato.</strong></label>
+    </body>
+
+{% endblock %}
