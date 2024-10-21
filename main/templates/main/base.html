@@ -9,10 +9,32 @@
     integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 
     <style type="text/css">
-        body {
-            position: relative;
-            overflow: scroll;
+        :root {
+            --primary-color: #1e3a8a; 
+            --secondary-color: #2563eb;
+            --accent-color: #60a5fa; 
+            --background-color: #f3f4f6; 
+            --text-color: #111827; 
+            --light-gray: #e5e7eb;
+            --white: #ffffff;
         }
+
+        body {
+            font-family: 'Open Sans', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            color: var(--primary-color);
+            font-size: 2rem;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: 700;
+        }
+
         header {
             background-color: white;
         }
@@ -102,6 +124,7 @@
         <a href="/">Contratos Ativos</a>
         <a href="/create">Create</a>
         <a href="/view">View</a>
+        <a href="/">Caderno Encargos</a>
 
         <div style="position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);">
             {% if user.is_authenticated %}
