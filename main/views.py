@@ -1,9 +1,10 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse, HttpResponseRedirect
-from .models import ToDoList, Item, UploadedFile, Contract
+from .models import ToDoList, Item, UploadedFile, Contract, CadernoEncargos
 from .forms import CreateNewList
-from datetime import datetime
+from datetime import datetime, date
 from dateutil.relativedelta import relativedelta
+from django.core.exceptions import ValidationError
 
 def index(response, id):
     ls = ToDoList.objects.get(id=id)
@@ -59,10 +60,12 @@ def upload_file(request):
     return redirect('home')
 
 def calcular_diferenca(data_inicial, data_final):
-    data_inicial = datetime.strptime(data_inicial, '%Y-%m-%d')
-    data_final = datetime.strptime(data_final, '%Y-%m-%d')
-    
-    diferenca = relativedelta(data_final, data_inicial)
+    if isinstance(data_inicial, date) and isinstance(data_final, date):
+        diferenca = relativedelta(data_final, data_inicial)
+    else:
+        data_inicial = datetime.strptime(data_inicial, '%Y-%m-%d')
+        data_final = datetime.strptime(data_final, '%Y-%m-%d')
+        diferenca = relativedelta(data_final, data_inicial)
     
     partes = []
     if diferenca.years:
@@ -169,9 +172,60 @@ def get_global_context(request):
         'is_contrato_detalhes': request.path.startswith('/contrato/detalhes/')
     }
 
-def caderno_encargos(request):
-    # Lógica para a página do caderno de encargos
-    return render(request, 'main/caderno_encargos.html')
+def caderno_encargos(request, contract_id):
+    contract = get_object_or_404(Contract, id=contract_id, user=request.user)
+
+    if request.method == "POST":
+        procedimento_n = request.POST.get("procedimento_n")
+        contrato_celebrado = request.POST.get("contrato_celebrado")
+        periodo_vigencia = request.POST.get("periodo_vigencia")
+
+        # Normaliza e converte o valor do contrato
+        valor_contrato_str = request.POST.get("valor_contrato", "").replace('€', '').replace('.', '').replace(',', '.').strip()
+        try:
+            valor_contrato = float(valor_contrato_str) if valor_contrato_str else 0.0
+        except ValueError:
+            error_message = "Valor inválido para o contrato."
+            return render(request, 'main/caderno_encargos.html', {'contract_data': contract, 'error_message': error_message})
+
+        fornecedor = request.POST.get("fornecedor")
+        nif = request.POST.get("nif")
+        cumprimento_prazo = request.POST.get("cumprimento_prazo") == "sim"
+        penalidade = request.POST.get("penalidade") == "sim"
+        justificar_prazo = request.POST.get("justificar_prazo", "")
+        defeitos = request.POST.get("defeitos", "")
+        sugestoes = request.POST.get("sugestoes", "")
+
+        caderno = CadernoEncargos(
+            user=request.user,
+            procedimento_n=procedimento_n,
+            contrato_celebrado=contrato_celebrado,
+            periodo_vigencia=periodo_vigencia,
+            valor_contrato=valor_contrato,
+            fornecedor=fornecedor,
+            nif=nif,
+            cumprimento_prazo=cumprimento_prazo,
+            penalidade=penalidade,
+            justificar_prazo=justificar_prazo,
+            defeitos=defeitos,
+            sugestoes=sugestoes,
+        )
+        caderno.save()
+        return redirect('caderno_encargos', contract_id=contract_id)
+
+    try:
+        caderno = CadernoEncargos.objects.get(user=request.user, procedimento_n=contract.numero)
+        return render(request, 'main/caderno_encargos_visualizar.html', {'caderno': caderno, 'contract': contract})
+    except CadernoEncargos.DoesNotExist:
+        contract_data = {
+            'procedimento_n': contract.numero,
+            'contrato_celebrado': contract.data_inicial,
+            'periodo_vigencia': calcular_diferenca(contract.data_inicial, contract.data_final),
+            'valor_contrato': contract.preco_contratual,
+            'fornecedor': contract.fornecedor,
+            'nif': contract.nif,
+        }
+        return render(request, 'main/caderno_encargos.html', {'contract_data': contract_data, 'contract': contract})
 
 def contrato_detalhes(request, contract_id):
     contract = Contract.objects.get(id=contract_id, user=request.user)

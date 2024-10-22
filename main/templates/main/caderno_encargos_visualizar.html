@@ -1,0 +1,18 @@
+{% extends 'main/base.html' %}
+{% block content %}
+<h1>Caderno de Encargos - Visualização</h1>
+
+<p><strong>Procedimento Aquisitivo Nº:</strong> {{ caderno.procedimento_n }}</p>
+<p><strong>Contrato Celebrado em:</strong> {{ caderno.contrato_celebrado }}</p>
+<p><strong>Período de Vigência:</strong> {{ caderno.periodo_vigencia }}</p>
+<p><strong>Valor do Contrato:</strong> {{ caderno.valor_contrato }}</p>
+<p><strong>Fornecedor:</strong> {{ caderno.fornecedor }}</p>
+<p><strong>NIF:</strong> {{ caderno.nif }}</p>
+<p><strong>Cumprimento do Prazo:</strong> {{ caderno.cumprimento_prazo|yesno:"Sim,Não" }}</p>
+<p><strong>Penalidade:</strong> {{ caderno.penalidade|yesno:"Sim,Não" }}</p>
+<p><strong>Justificativa:</strong> {{ caderno.justificar_prazo }}</p>
+<p><strong>Defeitos:</strong> {{ caderno.defeitos }}</p>
+<p><strong>Sugestões:</strong> {{ caderno.sugestoes }}</p>
+
+<a href="{% url 'contrato_detalhes' contract.id %}">Voltar aos Detalhes do Contrato</a>
+{% endblock %}

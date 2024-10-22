@@ -17,6 +17,12 @@
 <p><strong>Recorrente:</strong> {{ contract.recorrente|yesno:"Sim,Não" }}</p>
 <p><strong>Compromisso:</strong> {{ contract.compromisso|yesno:"Sim,Não" }}</p>
 
+{% if contract.cadernoencargos_set.exists %}
+  <a href="{% url 'caderno_encargos' contract.id %}">Ver Caderno de Encargos</a>
+{% else %}
+  <a href="#">Caderno de Encargos Indisponível</a>
+{% endif %}
+
 <a href="{% url 'contrato_info' file_id=contract.uploaded_file.id %}">Editar</a>
 <a href="/">Voltar</a>
 

@@ -35,7 +35,7 @@ class Contract(models.Model):
     nif = models.CharField(max_length=100)
     data_inicial = models.DateField()
     data_final = models.DateField()
-    prazo = models.CharField(max_length=255)  # Ou use um modelo diferente para armazenar isso
+    prazo = models.CharField(max_length=255)
     preco_contratual = models.DecimalField(max_digits=10, decimal_places=2)
     observacao = models.TextField(blank=True, null=True)
     valor_entregue = models.DecimalField(max_digits=10, decimal_places=2)
@@ -45,3 +45,20 @@ class Contract(models.Model):
 
     def __str__(self):
         return f"{self.numero} - {self.fornecedor}"
+    
+class CadernoEncargos(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    procedimento_n = models.CharField(max_length=255)
+    contrato_celebrado = models.CharField(max_length=255)
+    periodo_vigencia = models.CharField(max_length=255)
+    valor_contrato = models.DecimalField(max_digits=10, decimal_places=2)
+    fornecedor = models.CharField(max_length=255)
+    nif = models.CharField(max_length=100)
+    cumprimento_prazo = models.BooleanField()
+    penalidade = models.BooleanField()
+    justificar_prazo = models.TextField(blank=True, null=True)
+    defeitos = models.TextField(blank=True, null=True)
+    sugestoes = models.TextField(blank=True, null=True)
+
+    def __str__(self):
+        return f"Relatório de {self.fornecedor} - {self.procedimento_n}"
