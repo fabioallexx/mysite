@@ -6,6 +6,113 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+    form {
+        border-radius: 8px;
+        padding: 30px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        max-width: 950px;
+        margin: auto;
+    }
+    h2 {
+        color: var(--primary-color);
+        font-size: 2.5rem;
+        margin-bottom: 20px;
+        }
+    p {
+        font-size: 1.125rem;
+        margin-bottom: 15px;
+        }
+
+    label {
+        font-weight: 600;
+        color: var(--primary-color);
+        margin-bottom: 10px;
+        display: inline-block;
+    }
+
+    input[type="text"],
+    input[type="date"],
+    select {
+        width: calc(100% - 20px);
+        padding: 10px;
+        border: 1px solid var(--light-gray);
+        border-radius: 8px;
+        margin-bottom: 10px;
+        background-color: var(--white);
+        transition: box-shadow 0.3s, border-color 0.3s;
+        font-size: 1rem;
+    }
+
+    input[type="text"]:focus,
+    input[type="date"]:focus,
+    select:focus {
+        border-color: var(--secondary-color);
+        box-shadow: 0 0 8px rgba(37, 99, 235, 0.3);
+        outline: none;
+    }
+
+    .btn-guardar {
+        background-color: var(--secondary-color);
+        color: white;
+        padding: 12px 20px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: background-color 0.3s;
+    }
+
+    .btn-guardar {
+        background-color: var(--primary-color);
+    }
+
+    a:hover {
+        text-decoration: underline;
+    }
+
+    .alert-container {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 30px;
+    }
+
+    .alert-box {
+        border: 1px solid var(--light-gray);
+        border-radius: 10px;
+        padding: 15px;
+        flex: 1;
+        margin-right: 10px;
+        background-color: var(--accent-color);
+        color: var(--white);
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    }
+
+    .alert-box:last-child {
+        margin-right: 0;
+    }
+
+    input[readonly] {
+        background-color: var(--light-gray);
+        border-color: var(--light-gray);
+    }
+
+    @media (max-width: 768px) {
+        input[type="text"],
+        input[type="date"],
+        select {
+            width: 100%;
+        }
+
+        form {
+            padding: 20px;
+        }
+
+        .alert-container {
+            flex-direction: column;
+        }
+    }
+    </style>
     <h1>Relatório de Gestão de Contrato</h1>
 
     <script>
@@ -30,9 +137,8 @@
     </script>
 </head>
 <body>
-    <h2>Identificação do Contrato</h2>
-
     <form method="POST">
+        <h2>Identificação do Contrato</h2>
         {% csrf_token %}
         <label for="procedimento_n"><strong>Procedimento Aquisitivo Nº:</strong></label>
         <input type="text" id="procedimento_n" name="procedimento_n" readonly style="background-color: #e9ecef;" required value="{{ contract_data.procedimento_n }}">
@@ -56,15 +162,15 @@
 
         <h2>Avaliação dos Serviços Executados</h2>
 
-        <label for="cumprimento_prazo"><strong>CUMPRIMENTO DO PRAZO</strong></label>
+        <label for="cumprimento_prazo"><strong>CUMPRIMENTO DO PRAZO</strong></label><br>
         <input type="radio" id="cumprimento_sim" name="cumprimento_prazo" value="sim" required>
-        <label for="cumprimento_sim">Sim</label><br>
+        <label for="cumprimento_sim">Sim</label>
         <input type="radio" id="cumprimento_nao" name="cumprimento_prazo" value="nao" required>
         <label for="cumprimento_nao">Não</label><br>
 
-        <label for="incumprimento_prazo"><strong>Em caso de incumprimento de prazo, foi solicitado o acionamento de penalidades contratuais?</strong></label>
+        <label for="incumprimento_prazo"><strong>Em caso de incumprimento de prazo, foi solicitado o acionamento de penalidades contratuais?</strong></label><br>
         <input type="radio" id="penalidade_sim" name="penalidade" value="sim" required onclick="toggleJustification()">
-        <label for="penalidade_sim">Sim</label><br>
+        <label for="penalidade_sim">Sim</label>
         <input type="radio" id="penalidade_nao" name="penalidade" value="nao" required onclick="toggleJustification()">
         <label for="penalidade_nao">Não</label><br>
 
@@ -72,6 +178,11 @@
             <label for="justificar_prazo"><strong>Em caso negativo, justificar a opção/decisão:</strong></label>
             <input type="text" id="justificar_prazo" name="justificar_prazo" required value="{{ justificar_prazo }}">
         </div>
+
+        <label for="cumprimento_prazo"><strong>CONFORMIDADE DO CONTRATADO - cumprimento das obrigações contratuais principais (conferência do bem/serviço/empreitada tendo em conta os
+         dados constantes no contrato/proposta/CE/projeto de execução, nomeadamente a referência/descrição do bem/serviço/empreitada e a respeitva quantidade, bem como, a conformidade
+         das características dos bens/serviços/empreitadas com os requisitos técnicos e funcionais pré-definidos, condições do seu acondicionamento e/ou qualidade dos resultados
+         apresentados face aos objetivos definidos em termos de cumprimento dos níveis de serviço acordados)</strong></label>
 
         <label for="defeitos"><strong>Desvios, Defeitos ou Anomalias detetadas na execução do contrato:</strong></label>
         <input type="text" id="defeitos" name="defeitos" required value="{{ defeitos }}">
@@ -81,11 +192,11 @@
 
         <div id="current-date" style="margin-top: 20px; font-weight: bold;"></div>
 
-        <button type="submit" name="save">Guardar</button>
-    </form>
+        <button type="submit" name="save" class="btn-guardar" id="btn-guardar">Guardar</button>
 
-    <hr style="margin-top: 20px; border: 1px solid #000; width: 200px; margin-left: auto; margin-right: auto;">
-    <label style="display: block; margin-top: 5px; text-align: center; font-weight: bold;">O Gestor de Contrato</label>
+        <hr style="margin-top: 20px; border: 1px solid #000; width: 200px; margin-left: auto; margin-right: auto;">
+        <label style="display: block; margin-top: 5px; text-align: center; font-weight: bold;">O Gestor de Contrato</label>
+    </form>
 
     <label for="nota"><strong>Nota:</strong></label>
     <label for="nota_ctn"><strong>O gestor do contrato deve remeter o presente relatório via email para o Gabinete de Aprovisionamento gab.aprovisionamento@cm-moita.pt no prazo máximo de 10 dias úteis após a conferência/validação da última fatura do contrato.</strong></label>
