@@ -42,6 +42,7 @@ class Contract(models.Model):
     recorrente = models.BooleanField(default=False)
     compromisso = models.BooleanField(default=False)
     uploaded_file = models.ForeignKey(UploadedFile, on_delete=models.CASCADE)
+    plurianual = models.TextField(blank=True, null=True)
 
     def __str__(self):
         return f"{self.numero} - {self.fornecedor}"

@@ -89,33 +89,60 @@
 
 
 <script>
-    const dataInicial = new Date("{{ contract.data_inicial|date:'Y-m-d' }}").getTime();
-    const dataFinal = new Date("{{ contract.data_final|date:'Y-m-d' }}").getTime();
-    
-    function updatePrazo() {
-        const agora = Date.now();
-        const totalDuration = dataFinal - dataInicial;
-        const elapsed = agora - dataInicial;
-        const percentage = (elapsed / totalDuration) * 100;
 
-        const prazoIcon = document.getElementById('prazo-icon');
-        
-        prazoIcon.innerHTML = '';
+const dataFinal = new Date("{{ contract.data_final|date:'Y-m-d' }}");
 
-        if (percentage >= 75) {
-            prazoIcon.innerHTML = '🔴'; // Exemplo de ícone para 75% ou mais
-        } else if (percentage >= 50) {
-            prazoIcon.innerHTML = '🟡'; // Exemplo de ícone para 50% ou mais
-        } else if (percentage >= 25) {
-            prazoIcon.innerHTML = '🟢'; // Exemplo de ícone para 25% ou mais
-        } else {
-            prazoIcon.innerHTML = '⚪'; // Exemplo de ícone para menos de 25%
-        }
+function calcularDiferenca(dataFinal) {
+    const agora = new Date();
+    const diff = dataFinal - agora; // Diferença em milissegundos
+
+    // Se a data já passou
+    if (diff < 0) {
+        return { anos: -1, meses: 0, dias: 0 }; // Indica que o contrato expirou
     }
 
-    // Atualizar a cada segundo
-    setInterval(updatePrazo, 1000);
-    updatePrazo();
+    let anos = dataFinal.getFullYear() - agora.getFullYear();
+    let meses = dataFinal.getMonth() - agora.getMonth();
+    let dias = dataFinal.getDate() - agora.getDate();
+
+    // Ajustar para os casos onde o mês ou dia ainda não ocorreram
+    if (dias < 0) {
+        meses--;
+        const ultimoDiaMes = new Date(agora.getFullYear(), agora.getMonth() + 1, 0).getDate();
+        dias += ultimoDiaMes;
+    }
+    if (meses < 0) {
+        anos--;
+        meses += 12;
+    }
+
+    return { anos, meses, dias };
+}
+
+function updatePrazo() {
+    const { anos, meses, dias } = calcularDiferenca(dataFinal);
+        
+    const prazoElement = document.getElementById('prazo');
+    const prazoIcon = document.getElementById('prazo-icon');
+        
+    prazoElement.innerHTML = `${anos} ano${anos !== 1 ? 's' : ''}, ${meses} mes${meses !== 1 ? 'es' : ''}, ${dias} dia${dias !== 1 ? 's' : ''}`;
+
+    if (anos < 0) {
+        prazoIcon.innerHTML = '🔴'; // Contrato expirado
+    } else if (anos === 0 && meses === 0 && dias < 0) {
+        prazoIcon.innerHTML = '🔴'; // Contrato expirado
+    } else if (anos === 0 && meses === 0) {
+        prazoIcon.innerHTML = '🟡'; // Menos de um mês
+    } else if (anos === 0) {
+        prazoIcon.innerHTML = '🟢'; // Menos de um ano
+    } else {
+        prazoIcon.innerHTML = '⚪'; // Mais de um ano
+    }
+}
+
+// Atualizar a cada segundo
+setInterval(updatePrazo, 1000);
+updatePrazo();
 </script>
 
 {% endblock %}

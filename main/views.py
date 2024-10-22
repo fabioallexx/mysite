@@ -99,10 +99,12 @@ def contrato_info(request, file_id):
         procedimento = request.POST.get("procedimento", "")
         numero = request.POST.get("numero", "")
         tipo_contrato = request.POST.get("tipo_contrato", "")
-        fornecedor = request.POST.get("nome", "")
+        fornecedor = request.POST.get("fornecedor", "")
         nif = request.POST.get("nif", "")
         data_inicial = request.POST.get("data_inicial", "")
         data_final = request.POST.get("data_final", "")
+        anos_plurianual = gerar_plurianual(data_inicial, data_final)
+        plurianual = ', '.join(map(str, anos_plurianual))
         preco_contratual_str = request.POST.get("preco_contratual", "").replace('€', '').replace('.', '').replace(',', '.').strip()
         valor_entregue_str = request.POST.get("valor_entregue", "").replace('€', '').replace('.', '').replace(',', '.').strip()
         preco_contratual = float(preco_contratual_str) if preco_contratual_str else 0.0
@@ -126,6 +128,7 @@ def contrato_info(request, file_id):
             contract.valor_entregue = valor_entregue
             contract.recorrente = recorrente
             contract.compromisso = compromisso
+            contract.plurianual = plurianual
             contract.save()
         else:
             contract = Contract(
@@ -144,6 +147,7 @@ def contrato_info(request, file_id):
                 recorrente=recorrente,
                 compromisso=compromisso,
                 uploaded_file=uploaded_file,
+                plurianual=plurianual,
             )
             contract.save()
         return redirect('admin:main_contract_changelist')
@@ -163,7 +167,8 @@ def contrato_info(request, file_id):
         "observacao": contract.observacao if contract else '',
         "valor_entregue": contract.valor_entregue if contract else '',
         "recorrente": 'Sim' if contract and contract.recorrente else 'Não',
-        "compromisso": 'Sim' if contract and contract.compromisso else 'Não'
+        "compromisso": 'Sim' if contract and contract.compromisso else 'Não',
+        "plurianual": contract.plurianual if contract else '',
     })
 
 def get_global_context(request):
@@ -180,7 +185,6 @@ def caderno_encargos(request, contract_id):
         contrato_celebrado = request.POST.get("contrato_celebrado")
         periodo_vigencia = request.POST.get("periodo_vigencia")
 
-        # Normaliza e converte o valor do contrato
         valor_contrato_str = request.POST.get("valor_contrato", "").replace('€', '').replace('.', '').replace(',', '.').strip()
         try:
             valor_contrato = float(valor_contrato_str) if valor_contrato_str else 0.0
@@ -192,7 +196,10 @@ def caderno_encargos(request, contract_id):
         nif = request.POST.get("nif")
         cumprimento_prazo = request.POST.get("cumprimento_prazo") == "sim"
         penalidade = request.POST.get("penalidade") == "sim"
-        justificar_prazo = request.POST.get("justificar_prazo", "")
+
+        # Justificativa opcional
+        justificar_prazo = request.POST.get("justificar_prazo", "") if not penalidade else ""
+
         defeitos = request.POST.get("defeitos", "")
         sugestoes = request.POST.get("sugestoes", "")
 
@@ -206,7 +213,7 @@ def caderno_encargos(request, contract_id):
             nif=nif,
             cumprimento_prazo=cumprimento_prazo,
             penalidade=penalidade,
-            justificar_prazo=justificar_prazo,
+            justificar_prazo=justificar_prazo if not penalidade else None,
             defeitos=defeitos,
             sugestoes=sugestoes,
         )
@@ -232,3 +239,11 @@ def contrato_detalhes(request, contract_id):
     context = {'contract': contract}
     context.update(get_global_context(request))
     return render(request, 'main/contrato_detalhes.html', context)
+
+def gerar_plurianual(data_inicial, data_final):
+    anos = []
+    if data_inicial and data_final:
+        ano_inicial = datetime.strptime(data_inicial, '%Y-%m-%d').year
+        ano_final = datetime.strptime(data_final, '%Y-%m-%d').year
+        anos = list(range(ano_inicial, ano_final + 1))
+    return anos

@@ -8,104 +8,103 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Informações do Contrato</title>
     <style>
-form {
-    border-radius: 8px;
-    padding: 30px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-    max-width: 950px;
-    margin: auto;
-}
+        form {
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            max-width: 950px;
+            margin: auto;
+        }
 
-label {
-    font-weight: 600;
-    color: var(--primary-color);
-    margin-bottom: 10px;
-    display: inline-block;
-}
+        label {
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            display: inline-block;
+        }
 
-input[type="text"],
-input[type="date"],
-select {
-    width: calc(100% - 20px);
-    padding: 10px;
-    border: 1px solid var(--light-gray);
-    border-radius: 8px;
-    margin-bottom: 10px;
-    background-color: var(--white);
-    transition: box-shadow 0.3s, border-color 0.3s;
-    font-size: 1rem;
-}
+        input[type="text"],
+        input[type="date"],
+        select {
+            width: calc(100% - 20px);
+            padding: 10px;
+            border: 1px solid var(--light-gray);
+            border-radius: 8px;
+            margin-bottom: 10px;
+            background-color: var(--white);
+            transition: box-shadow 0.3s, border-color 0.3s;
+            font-size: 1rem;
+        }
 
-input[type="text"]:focus,
-input[type="date"]:focus,
-select:focus {
-    border-color: var(--secondary-color);
-    box-shadow: 0 0 8px rgba(37, 99, 235, 0.3);
-    outline: none;
-}
+        input[type="text"]:focus,
+        input[type="date"]:focus,
+        select:focus {
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 8px rgba(37, 99, 235, 0.3);
+            outline: none;
+        }
 
-.btn-salv, .btn-conf {
-    background-color: var(--secondary-color);
-    color: white;
-    padding: 12px 20px;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: 600;
-    transition: background-color 0.3s;
-}
+        .btn-salv, .btn-conf {
+            background-color: var(--secondary-color);
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.3s;
+        }
 
-.btn-salv:hover, .btn-conf:hover {
-    background-color: var(--primary-color);
-}
+        .btn-salv:hover, .btn-conf:hover {
+            background-color: var(--primary-color);
+        }
 
-a:hover {
-    text-decoration: underline;
-}
+        a:hover {
+            text-decoration: underline;
+        }
 
-.alert-container {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 30px;
-}
+        .alert-container {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+        }
 
-.alert-box {
-    border: 1px solid var(--light-gray);
-    border-radius: 10px;
-    padding: 15px;
-    flex: 1;
-    margin-right: 10px;
-    background-color: var(--accent-color);
-    color: var(--white);
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-}
+        .alert-box {
+            border: 1px solid var(--light-gray);
+            border-radius: 10px;
+            padding: 15px;
+            flex: 1;
+            margin-right: 10px;
+            background-color: var(--accent-color);
+            color: var(--white);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+        }
 
-.alert-box:last-child {
-    margin-right: 0;
-}
+        .alert-box:last-child {
+            margin-right: 0;
+        }
 
-input[readonly] {
-    background-color: var(--light-gray);
-    border-color: var(--light-gray);
-}
+        input[readonly] {
+            background-color: var(--light-gray);
+            border-color: var(--light-gray);
+        }
 
-@media (max-width: 768px) {
-    input[type="text"],
-    input[type="date"],
-    select {
-        width: 100%;
-    }
+        @media (max-width: 768px) {
+            input[type="text"],
+            input[type="date"],
+            select {
+                width: 100%;
+            }
 
-    form {
-        padding: 20px;
-    }
+            form {
+                padding: 20px;
+            }
 
-    .alert-container {
-        flex-direction: column;
-    }
-}
+            .alert-container {
+                flex-direction: column;
+            }
+        }
     </style>
-    
 </head>
 <body>
     <h1>Informações do Contrato</h1>
@@ -137,7 +136,7 @@ input[readonly] {
         </select>
     
         <label for="fornecedor"><strong>Fornecedor:</strong></label>
-        <input type="text" id="nome" name="nome" required value="{{ fornecedor }}">
+        <input type="text" id="fornecedor" name="fornecedor" required value="{{ fornecedor }}">
         
         <label for="nif"><strong>NIF:</strong></label>
         <input type="text" id="nif" name="nif" pattern="\d{9}" maxlength="9" title="Apenas 9 números" required value="{{ nif }}">
@@ -157,158 +156,148 @@ input[readonly] {
         <label for="observacao"><strong>Observações:</strong></label>
         <input type="text" id="observacao" name="observacao" size="60">
 
-    <br><br>
+        <br><br>
 
-    <h1>Alertas</h1>
+        <h1>Alertas</h1>
+        
+        <div style="display: flex; gap: 60px; align-items: flex-start;">
+            <div style="display: flex; flex-direction: column;">
+                <label for="plurianual"><strong>Plurianual:</strong></label>
+                <div id="plurianual" style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <!-- Os anos serão adicionados aqui pelo JavaScript -->
+                </div>
+            </div>
     
-    <div style="display: flex; gap: 60px; align-items: flex-start;">
-        <div style="display: flex; flex-direction: column;">
-            <label for="plurianual"><strong>Plurianual:</strong></label>
-            <div style="display: flex; gap: 10px;">
-                {% for ano in anos_plurianual %}
-                    <div style="border: 1px solid #ccc; padding: 5px;">
-                        {{ ano }}
-                    </div>
-                {% endfor %}
+            <div style="display: flex; flex-direction: column;">
+                <label for="valor_entregue" style="margin-top: 3px;"><strong>Valor Entregue:</strong></label>
+                <input type="text" id="valor_entregue" name="valor_entregue" size="50" required value="{{ valor_entregue }}">
             </div>
         </div>
-    
-        <div style="display: flex; flex-direction: column;">
-            <label for="valor_entregue" style="margin-top: 3px;"><strong>Valor Entregue:</strong></label>
-            <input type="text" id="valor_entregue" name="valor_entregue" size="50" required value="{{ valor_entregue }}">
-        </div>
-    </div>
 
-    <br><br>
+        <br><br>
 
-    <label for="compromisso"><strong>Recorrente:</strong></label>
-    <select id="compromisso" name="compromisso">
-        <option value="Sim">Sim</option>
-        <option value="Não">Não</option>
-    </select>
+        <label for="compromisso"><strong>Recorrente:</strong></label>
+        <select id="compromisso" name="compromisso">
+            <option value="Sim">Sim</option>
+            <option value="Não">Não</option>
+        </select>
 
-    <label for="compromisso"><strong>Compromisso:</strong></label>
-    <input type="text" id="compromisso" name="compromisso" size="30; margin-right": 15px required value="{{ compromisso }}">
+        <label for="compromisso"><strong>Compromisso:</strong></label>
+        <input type="text" id="compromisso" name="compromisso" size="30" required value="{{ compromisso }}">
 
-    <br><br>
+        <br><br>
 
-    <button type="submit" class="btn-salv" id="btn-salv">Salvar</button>
-</form>
+        <button type="submit" class="btn-salv" id="btn-salv">Salvar</button>
+    </form>
 
-<a href="/">Voltar</a>
+    <a href="/">Voltar</a>
 
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-    const precoInput = document.getElementById('preco_contratual');
+    <script>
+        function formatCurrency(input) {
+            let value = input.value.replace(/[^\d,€]/g, '').replace('€', '').trim();
 
-    precoInput.addEventListener('input', function (event) {
-        let value = precoInput.value.replace(/[^\d,€]/g, '').replace('€', '').trim();
-
-        if ((value.match(/,/g) || []).length > 1) {
-            value = value.replace(/,/g, '');
-        }
-
-        let parts = value.split(',');
-        parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-
-        let formattedValue = parts.join(',');
-        if (formattedValue !== '') {
-            formattedValue += ' €';
-        }
-        precoInput.value = formattedValue;
-
-        setTimeout(() => {
-            precoInput.setSelectionRange(formattedValue.length - 2, formattedValue.length - 2);
-        }, 0);
-    });
-
-    precoInput.addEventListener('focus', function () {
-        precoInput.value = precoInput.value.replace(' €', ''); 
-    });
-
-    precoInput.addEventListener('blur', function () {
-        if (precoInput.value !== '' && !precoInput.value.includes('€')) {
-            precoInput.value += ' €';
-        }
-    });
-});
-</script>
-
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const valorEntregueInput = document.getElementById('valor_entregue');
-    
-        valorEntregueInput.addEventListener('input', function (event) {
-            let value = valorEntregueInput.value.replace(/[^\d,]/g, '');
-    
             if ((value.match(/,/g) || []).length > 1) {
                 value = value.replace(/,/g, '');
             }
-    
+
             let parts = value.split(',');
-            
             parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-    
+
             let formattedValue = parts.join(',');
             if (formattedValue !== '') {
                 formattedValue += ' €';
             }
-            valorEntregueInput.value = formattedValue;
-    
+            input.value = formattedValue;
+
             setTimeout(() => {
-                valorEntregueInput.setSelectionRange(formattedValue.length - 2, formattedValue.length - 2);
+                input.setSelectionRange(formattedValue.length - 2, formattedValue.length - 2);
             }, 0);
-        });
-    
-        valorEntregueInput.addEventListener('focus', function () {
-            
-            valorEntregueInput.value = valorEntregueInput.value.replace(' €', ''); 
-        });
-    
-        valorEntregueInput.addEventListener('blur', function () {
-            
-            if (valorEntregueInput.value !== '' && !valorEntregueInput.value.includes('€')) {
-                valorEntregueInput.value += ' €';
-            }
-        });
-    });
-</script>
-
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const dataInicial = document.getElementById('data_inicial');
-        const dataFinal = document.getElementById('data_final');
-        const prazoInput = document.getElementById('prazo');
-    
-        function calcularPrazo() {
-            const inicial = new Date(dataInicial.value);
-            const final = new Date(dataFinal.value);
-            if (!isNaN(inicial) && !isNaN(final)) {
-                const diferenca = final - inicial;
-                const totalDias = Math.ceil(diferenca / (1000 * 60 * 60 * 24));
-                const anos = Math.floor(totalDias / 365);
-                const meses = Math.floor((totalDias % 365) / 30);
-                const diasRestantes = totalDias - (anos * 365 + meses * 30);
-    
-                let partes = [];
-                if (anos > 0) partes.push(`${anos} ${anos === 1 ? 'ano' : 'anos'}`);
-                if (meses > 0) partes.push(`${meses} ${meses === 1 ? 'mês' : 'meses'}`);
-                if (diasRestantes > 0) partes.push(`${diasRestantes} ${diasRestantes === 1 ? 'dia' : 'dias'}`);
-    
-                if (partes.length > 1) {
-                    const ultimaParte = partes.pop();
-                    prazoInput.value = partes.join(', ') + ' e ' + ultimaParte;
-                } else {
-                    prazoInput.value = partes.join(', ') || '0 dias';
-                }
-            } else {
-                prazoInput.value = '';
-            }
         }
-    
-        dataInicial.addEventListener('input', calcularPrazo);
-        dataFinal.addEventListener('input', calcularPrazo);
-    });
-</script>
 
+        document.addEventListener('DOMContentLoaded', function () {
+            const precoInput = document.getElementById('preco_contratual');
+            const valorEntregueInput = document.getElementById('valor_entregue');
+
+            precoInput.addEventListener('input', function () {
+                formatCurrency(precoInput);
+            });
+
+            precoInput.addEventListener('focus', function () {
+                precoInput.value = precoInput.value.replace(' €', '');
+            });
+
+            valorEntregueInput.addEventListener('input', function () {
+                formatCurrency(valorEntregueInput);
+            });
+
+            valorEntregueInput.addEventListener('focus', function () {
+                valorEntregueInput.value = valorEntregueInput.value.replace(' €', '');
+            });
+
+            const dataInicial = document.getElementById('data_inicial');
+            const dataFinal = document.getElementById('data_final');
+            const plurianualDiv = document.getElementById('plurianual');
+
+            function calcularPrazo() {
+                const inicial = new Date(dataInicial.value);
+                const final = new Date(dataFinal.value);
+                const prazoInput = document.getElementById('prazo');
+
+                if (!isNaN(inicial) && !isNaN(final)) {
+                    const umAno = 365 * 24 * 60 * 60 * 1000; // milissegundos em um ano
+                    const umMes = 30 * 24 * 60 * 60 * 1000; // milissegundos em um mês
+                    const prazoEmAnos = Math.floor((final - inicial) / umAno);
+                    const prazoEmMeses = Math.floor(((final - inicial) % umAno) / umMes);
+                    const prazoEmDias = Math.ceil(((final - inicial) % umAno) % umMes / (24 * 60 * 60 * 1000));
+                    
+                    let prazoTexto = '';
+                    if (prazoEmAnos > 0) {
+                        prazoTexto += prazoEmAnos + (prazoEmAnos === 1 ? ' ano' : ' anos');
+                    }
+                    if (prazoEmMeses > 0) {
+                        prazoTexto += (prazoTexto ? ', ' : '') + prazoEmMeses + (prazoEmMeses === 1 ? ' mês' : ' meses');
+                    }
+                    if (prazoEmDias > 0) {
+                        prazoTexto += (prazoTexto ? ' e ' : '') + prazoEmDias + (prazoEmDias === 1 ? ' dia' : ' dias');
+                    }
+                    prazoInput.value = prazoTexto || '0 dias'; // caso não haja prazo
+                } else {
+                    prazoInput.value = ''; // Limpa o campo se as datas forem inválidas
+                }
+            }
+
+            function calcularPlurianual() {
+                const inicial = new Date(dataInicial.value);
+                const final = new Date(dataFinal.value);
+                plurianualDiv.innerHTML = ''; // Limpa os anos anteriores
+                
+                if (!isNaN(inicial) && !isNaN(final)) {
+                    const anos = [];
+                    for (let year = inicial.getFullYear(); year <= final.getFullYear(); year++) {
+                        anos.push(year);
+                    }
+
+                    anos.forEach(year => {
+                        const yearDiv = document.createElement('div');
+                        yearDiv.style.border = "1px solid #ccc";
+                        yearDiv.style.padding = "5px";
+                        yearDiv.textContent = year;
+                        plurianualDiv.appendChild(yearDiv);
+                    });
+                }
+            }
+
+            dataInicial.addEventListener('input', function() {
+                calcularPrazo();
+                calcularPlurianual();
+            });
+
+            dataFinal.addEventListener('input', function() {
+                calcularPrazo();
+                calcularPlurianual();
+            });
+        });
+    </script>
+</body>
+</html>
 {% endblock %}
