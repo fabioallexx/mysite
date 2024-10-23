@@ -1,52 +1,142 @@
 {% extends 'main/base.html' %}
 {% load humanize %}
 {% block content %}
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            background-color: var(--background-color);
+            color: var(--text-color);
+            font-family: 'Arial', sans-serif;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: separate;
+            margin-bottom: 20px;
+        }
+
+        th, td {
+            padding: 1px 40px;
+            text-align: center;
+            border-bottom: 1px solid var(--light-gray);
+        }
+
+        th {
+            background-color: var(--primary-color);
+            color: var(--white);
+            font-weight: bold;
+            text-transform: capitalize;
+        }
+
+        td {
+            background-color: var(--white);
+        }
+
+        tr:nth-child(even) td {
+            background-color: var(--light-gray);
+        }
+
+        h1 {
+            color: var(--primary-color);
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .btn-vdetalhes {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: var(--secondary-color);
+            color: var(--white);
+            text-decoration: none;
+            border-radius: 5px;
+            text-align: center;
+        }
+
+        .btn-vdetalhes:hover {
+            background-color: var(--accent-color);
+        }
+</style>
 
 <h1>Fatura</h1>
 
 <table>
     <tr>
-        <th>Descrição</th>
-        <th>Valor</th>
+        <th>Execução do Contrato</th>
     </tr>
     <tr>
-        <td>Procedimento</td>
-        <td>{{ contrato.procedimento }}</td>
+        <th>Data</th>
+        <th>Número</th>
+        <th>Procedimento Adjudicação</th>
+        <th>Data Inicial</th>
+        <th>Data Final</th>
     </tr>
     <tr>
-        <td>Nº</td>
+        <td></td>
         <td>{{ contrato.numero }}</td>
-    </tr>
-    <tr>
-        <td>Fornecedor</td>
-        <td>{{ contrato.fornecedor }}</td>
-    </tr>
-    <tr>
-        <td>NIF</td>
-        <td>{{ contrato.nif }}</td>
-    </tr>
-    <tr>
-        <td>Data Inicial</td>
+        <td>{{ contrato.procedimento }}</td>
         <td>{{ contrato.data_inicial }}</td>
-    </tr>
-    <tr>
-        <td>Data Final</td>
         <td>{{ contrato.data_final }}</td>
     </tr>
     <tr>
-        <td>Preço Contratual</td>
+        <th>Fornecedor</th>
+        <th>Tipo de Contrato</th>
+        <th>Valor Total</th>
+    </tr>
+    <tr>
+        <td>{{ contrato.fornecedor }}</td>
+        <td>{{ contrato.tipo_contrato }}</td>
         <td>{{ contrato.preco_contratual|floatformat:2|intcomma }} €</td>
     </tr>
     <tr>
-        <td>Valor Entregue</td>
-        <td>{{ contrato.valor_entregue|floatformat:2|intcomma }} €</td>
+        <th>Objeto</th>
     </tr>
     <tr>
-        <td>Observações</td>
         <td>{{ contrato.observacao }}</td>
+    </tr>
+    <tr>
+        <th>Valor sem IVA</th>
+        <th>Valor Requisitado</th>
+        <th>Valor Entregue</th>
+        <th>Contratação</th>
+        <th>Tipo de Produto</th>
+        <th>Situação</th>
+    </tr>
+    <tr>
+        <td></td>
+        <td></td>
+        <td>{{ contrato.valor_entregue|floatformat:2|intcomma }} €</td>
+        <td>VALOR GLOBAL</td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <th>Já Executado</th>
+        <th>Em execução no ano</th>
+        <th>(80,5%)</th>
+        <th>Execução Global</th>
+        <th>(80,5%)</th>
+    </tr>
+    <tr>
+        <th>Pago (anos anteriores)</th>
+        <th>Comprometido</th>
+        <th>Pago</th>
+        <th>Contratado</th>
+        <th>Pago</th>
+    </tr>
+    <tr>
+        <td></td>
+        <td>{{ contrato.preco_contratual|floatformat:2|intcomma }} €</td>
+        <td>{{ contrato.valor_entregue|floatformat:2|intcomma }} €</td>
+        <td>{{ contrato.preco_contratual|floatformat:2|intcomma }} €</td>
+        <td>{{ contrato.valor_entregue|floatformat:2|intcomma }} €</td>
     </tr>
 </table>
 
-<a href="{% url 'contrato_detalhes' contrato.id %}">Voltar aos Detalhes do Contrato</a>
+<a class="btn-vdetalhes" id="btn-vdetalhes" href="{% url 'contrato_detalhes' contrato.id %}">Voltar aos Detalhes do Contrato</a>
 
 {% endblock %}
