@@ -122,8 +122,7 @@
 <body>
     <div class="sidenav" id="sidenav">
         <a href="/">Contratos Ativos</a>
-        <a href="/create">Create</a>
-        <a href="/view">View</a>
+        <a href="/historico">Histórico</a>
         
         {% if is_contrato_detalhes and user.is_authenticated %}
         <a href="{% url 'caderno_encargos' contract.id %}">Caderno Encargos</a>

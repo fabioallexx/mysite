@@ -1,55 +1,38 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse, HttpResponseRedirect
-from .models import ToDoList, Item, UploadedFile, Contract, CadernoEncargos
+from .models import UploadedFile, Contract, CadernoEncargo, Historico
 from .forms import CreateNewList
 from datetime import datetime, date
 from dateutil.relativedelta import relativedelta
+from django.contrib import messages
 from django.core.exceptions import ValidationError
 
 def index(response, id):
-    ls = ToDoList.objects.get(id=id)
-
-    if ls in response.user.todolist.all():
-
-        if response.method == "POST":
-            if response.POST.get("save"):
-                for item in ls.item_set.all():
-                    if response.POST.get("c" + str(item.id)) == "clicked":
-                        item.complete = True
-                    else:
-                        item.complete = False
-                    item.save()
-            elif response.POST.get("newItem"):
-                txt = response.POST.get("new")
-                if len(txt) > 2:
-                    ls.item_set.create(text=txt, complete=False)
+    if response.method == "POST":
+        if response.POST.get("save"):
+            for item in ls.item_set.all():
+                if response.POST.get("c" + str(item.id)) == "clicked":
+                    item.complete = True
                 else:
-                    print("invalid")
-
-        return render(response, 'main/list.html', {"ls": ls, "tem_contrato": Contract.objects.filter(user=response.user).exists()})
-    return render(response, 'main/view.html', {"ls": ls})
+                    item.complete = False
+                    item.save()
+        elif response.POST.get("newItem"):
+            txt = response.POST.get("new")
+            return render(response, 'main/list.html', {"tem_contrato": Contract.objects.filter(user=response.user).exists()})
 
 def home(request):
-    context = get_global_context(request)
+    if request.user.is_authenticated:
+        contratos_ativos = []
+        for uf in request.user.uploadedfile.all():
+            contrato = uf.contract_set.filter(estado=True).first()
+            if contrato:
+                contratos_ativos.append((uf, contrato))
+
+    context = {
+        'contratos_ativos': contratos_ativos,
+        **get_global_context(request)
+    }
     return render(request, 'main/home.html', context)
-
-def create(response):
-    if response.method == "POST":
-        form = CreateNewList(response.POST)
-        
-        if form.is_valid():
-            n = form.cleaned_data["name"]
-            t = ToDoList(name=n)
-            t.save()
-            response.user.todolist.add(t)
-
-        return HttpResponseRedirect("/%i" %t.id)
-    else:    
-        form = CreateNewList()
-    return render(response, "main/create.html", {"form":form})
-
-def view(response):
-    return render(response, "main/view.html", {})
 
 def upload_file(request):
     if request.method == 'POST' and request.FILES.get('file'):
@@ -95,6 +78,7 @@ def contrato_info(request, file_id):
     uploaded_file = UploadedFile.objects.get(id=file_id, user=request.user)
     tem_contrato = Contract.objects.filter(user=request.user).exists() if request.user.is_authenticated else False
     contract = Contract.objects.filter(uploaded_file=uploaded_file, user=request.user).first()
+    estado = True
     if request.method == "POST":
         procedimento = request.POST.get("procedimento", "")
         numero = request.POST.get("numero", "")
@@ -113,6 +97,7 @@ def contrato_info(request, file_id):
         recorrente = request.POST.get("recorrente") == "Sim"
         compromisso = request.POST.get("compromisso") == "Sim"
         prazo = calcular_diferenca(data_inicial, data_final)
+        estado = request.POST.get("estado") == True
         
         if contract:
             contract.procedimento = procedimento
@@ -129,6 +114,7 @@ def contrato_info(request, file_id):
             contract.recorrente = recorrente
             contract.compromisso = compromisso
             contract.plurianual = plurianual
+            contract.estado = estado
             contract.save()
         else:
             contract = Contract(
@@ -148,6 +134,7 @@ def contrato_info(request, file_id):
                 compromisso=compromisso,
                 uploaded_file=uploaded_file,
                 plurianual=plurianual,
+                estado=estado,
             )
             contract.save()
         return redirect('admin:main_contract_changelist')
@@ -169,6 +156,7 @@ def contrato_info(request, file_id):
         "recorrente": 'Sim' if contract and contract.recorrente else 'Não',
         "compromisso": 'Sim' if contract and contract.compromisso else 'Não',
         "plurianual": contract.plurianual if contract else '',
+        "estado": estado, 
     })
 
 def get_global_context(request):
@@ -197,13 +185,12 @@ def caderno_encargos(request, contract_id):
         cumprimento_prazo = request.POST.get("cumprimento_prazo") == "sim"
         penalidade = request.POST.get("penalidade") == "sim"
 
-        # Justificativa opcional
         justificar_prazo = request.POST.get("justificar_prazo", "") if not penalidade else ""
 
         defeitos = request.POST.get("defeitos", "")
         sugestoes = request.POST.get("sugestoes", "")
 
-        caderno = CadernoEncargos(
+        caderno = CadernoEncargo(
             user=request.user,
             procedimento_n=procedimento_n,
             contrato_celebrado=contrato_celebrado,
@@ -221,9 +208,9 @@ def caderno_encargos(request, contract_id):
         return redirect('caderno_encargos', contract_id=contract_id)
 
     try:
-        caderno = CadernoEncargos.objects.get(user=request.user, procedimento_n=contract.numero)
+        caderno = CadernoEncargo.objects.get(user=request.user, procedimento_n=contract.numero)
         return render(request, 'main/caderno_encargos_visualizar.html', {'caderno': caderno, 'contract': contract})
-    except CadernoEncargos.DoesNotExist:
+    except CadernoEncargo.DoesNotExist:
         contract_data = {
             'procedimento_n': contract.numero,
             'contrato_celebrado': contract.data_inicial,
@@ -235,8 +222,10 @@ def caderno_encargos(request, contract_id):
         return render(request, 'main/caderno_encargos.html', {'contract_data': contract_data, 'contract': contract})
 
 def contrato_detalhes(request, contract_id):
-    contract = Contract.objects.get(id=contract_id, user=request.user)
-    context = {'contract': contract}
+    contract = get_object_or_404(Contract, id=contract_id, user=request.user)
+    context = {
+        'contract': contract,
+    }
     context.update(get_global_context(request))
     return render(request, 'main/contrato_detalhes.html', context)
 
@@ -247,3 +236,51 @@ def gerar_plurianual(data_inicial, data_final):
         ano_final = datetime.strptime(data_final, '%Y-%m-%d').year
         anos = list(range(ano_inicial, ano_final + 1))
     return anos
+
+def fechar_contrato(request, contract_id):
+    contrato = get_object_or_404(Contract, id=contract_id, user=request.user)
+
+    # Criar uma nova entrada em Historico
+    historico = Historico(
+        user=contrato.user,
+        procedimento=contrato.procedimento,
+        numero=contrato.numero,
+        tipo_contrato=contrato.tipo_contrato,
+        fornecedor=contrato.fornecedor,
+        nif=contrato.nif,
+        data_inicial=contrato.data_inicial,
+        data_final=contrato.data_final,
+        prazo=contrato.prazo,
+        preco_contratual=contrato.preco_contratual,
+        observacao=contrato.observacao,
+        valor_entregue=contrato.valor_entregue,
+        recorrente=contrato.recorrente,
+        compromisso=contrato.compromisso,
+        uploaded_file=contrato.uploaded_file,
+        plurianual=contrato.plurianual,
+        _estado=False  # Estado do contrato que está sendo fechado
+    )
+    historico.save()
+
+    # Marcar o contrato como inativo
+    contrato.estado = False
+    contrato.save()
+
+    # Redirecionar para a página inicial
+    return redirect('home')
+
+def historico_list(request):
+    if request.user.is_authenticated:
+        contratos_inativos = Historico.objects.filter(_estado=False, user=request.user)
+    else:
+        contratos_inativos = []
+
+    context = {
+        'contratos_inativos': contratos_inativos,
+        **get_global_context(request)
+    }
+    return render(request, 'main/historico.html', context)
+
+def detalhes_contrato_inativo(request, contract_id):
+    contrato = get_object_or_404(Historico, id=contract_id)
+    return render(request, 'main/detalhes_contrato_inativo.html', {'contrato': contrato})

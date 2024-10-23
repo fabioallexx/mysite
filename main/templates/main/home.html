@@ -4,18 +4,16 @@
 {% if user.is_authenticated %}
 <div>
     <ul style="list-style-type: disc; padding-left: 20px;">
-        {% for uf in user.uploadedfile.all %}
-        <li>
-            {% with contract=uf.contract_set.first %}
-                <a href="{% if contract %}{% url 'contrato_detalhes' contract.id %}{% else %}{% url 'contrato_info' file_id=uf.id %}{% endif %}">
-                    <span style="font-weight: bold; font-size: 1.1em;">
-                        {{ uf.name|slice:":-4"|capfirst }}  {# Remove a extensão do arquivo e capitaliza a primeira letra #}
-                    </span>
-                </a>
-            {% endwith %}
+        {% for uf, contract in contratos_ativos %}
+        <li class="list-group-item">
+            <a href="{% url 'contrato_detalhes' contract.id %}">
+                <span style="font-weight: bold; font-size: 1.1em;">
+                    {{ uf.name|slice:":-4"|capfirst }}  {# Remove a extensão do arquivo e capitaliza a primeira letra #}
+                </span>
+            </a>
         </li>
         {% empty %}
-            <li>Nenhum contrato carregado.</li>
+            <li class="list-group-item">Nenhum contrato ativo carregado.</li>
         {% endfor %}
     </ul>
 </div>

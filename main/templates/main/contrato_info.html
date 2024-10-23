@@ -244,8 +244,8 @@
                 const prazoInput = document.getElementById('prazo');
 
                 if (!isNaN(inicial) && !isNaN(final)) {
-                    const umAno = 365 * 24 * 60 * 60 * 1000; // milissegundos em um ano
-                    const umMes = 30 * 24 * 60 * 60 * 1000; // milissegundos em um mês
+                    const umAno = 365 * 24 * 60 * 60 * 1000;
+                    const umMes = 30 * 24 * 60 * 60 * 1000;
                     const prazoEmAnos = Math.floor((final - inicial) / umAno);
                     const prazoEmMeses = Math.floor(((final - inicial) % umAno) / umMes);
                     const prazoEmDias = Math.ceil(((final - inicial) % umAno) % umMes / (24 * 60 * 60 * 1000));
@@ -260,16 +260,16 @@
                     if (prazoEmDias > 0) {
                         prazoTexto += (prazoTexto ? ' e ' : '') + prazoEmDias + (prazoEmDias === 1 ? ' dia' : ' dias');
                     }
-                    prazoInput.value = prazoTexto || '0 dias'; // caso não haja prazo
+                    prazoInput.value = prazoTexto || '0 dias';
                 } else {
-                    prazoInput.value = ''; // Limpa o campo se as datas forem inválidas
+                    prazoInput.value = '';
                 }
             }
 
             function calcularPlurianual() {
                 const inicial = new Date(dataInicial.value);
                 const final = new Date(dataFinal.value);
-                plurianualDiv.innerHTML = ''; // Limpa os anos anteriores
+                plurianualDiv.innerHTML = '';
                 
                 if (!isNaN(inicial) && !isNaN(final)) {
                     const anos = [];

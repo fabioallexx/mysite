@@ -1,0 +1,21 @@
+{% extends 'main/base.html' %}
+{% load custom_filters %}
+{% block content %}
+<h1>{{ contrato.uploaded_file|capfirst|remove_all_extensions }}</h1>
+
+<li class="list-group-item">
+    <p><strong>Procedimento:</strong> {{ contrato.procedimento }}</p>
+    <p><strong>Número:</strong> {{ contrato.numero }}</p>
+    <p><strong>Fornecedor:</strong> {{ contrato.fornecedor }}</p>
+    <p><strong>Tipo de Contrato:</strong> {{ contrato.tipo_contrato }}</p>
+    <p><strong>NIF:</strong> {{ contrato.nif }}</p>
+    <p><strong>Contrato celebrado a:</strong> {{ contrato.data_inicial }}</p>
+    <p><strong>Contrato terminado a:</strong> {{ contrato.data_final }}</p>
+    <p><strong>Valor Contratual:</strong> {{ contrato.preco_contratual }}</p>
+    <p><strong>Valor Entregue:</strong> {{ contrato.valor_entregue }}</p>
+    <p><strong>Observação:</strong> {{ contrato.observacao }}</p>
+    <p><strong>Anos:</strong> {{ contrato.plurianual }}</p>
+    <a href="{% url 'historico' %}" class="btn-voltar" style="text-align: right;">Voltar</a>
+</li>
+
+{% endblock %}
