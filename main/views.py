@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse, HttpResponseRedirect
-from .models import UploadedFile, Contract, CadernoEncargo, Historico
+from .models import UploadedFile, Contract, CadernoEncargo, Historico, Fatura
 from .forms import CreateNewList
 from datetime import datetime, date
 from dateutil.relativedelta import relativedelta
@@ -240,7 +240,6 @@ def gerar_plurianual(data_inicial, data_final):
 def fechar_contrato(request, contract_id):
     contrato = get_object_or_404(Contract, id=contract_id, user=request.user)
 
-    # Criar uma nova entrada em Historico
     historico = Historico(
         user=contrato.user,
         procedimento=contrato.procedimento,
@@ -258,15 +257,13 @@ def fechar_contrato(request, contract_id):
         compromisso=contrato.compromisso,
         uploaded_file=contrato.uploaded_file,
         plurianual=contrato.plurianual,
-        _estado=False  # Estado do contrato que está sendo fechado
+        _estado=False
     )
     historico.save()
 
-    # Marcar o contrato como inativo
     contrato.estado = False
     contrato.save()
 
-    # Redirecionar para a página inicial
     return redirect('home')
 
 def historico_list(request):
@@ -284,3 +281,11 @@ def historico_list(request):
 def detalhes_contrato_inativo(request, contract_id):
     contrato = get_object_or_404(Historico, id=contract_id)
     return render(request, 'main/detalhes_contrato_inativo.html', {'contrato': contrato})
+
+def fatura(request, contract_id):
+    contrato = get_object_or_404(Contract, id=contract_id, user=request.user)
+
+    context = {
+        'contrato': contrato,
+    }
+    return render(request, 'main/fatura.html', context)

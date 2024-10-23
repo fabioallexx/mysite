@@ -1,0 +1,52 @@
+{% extends 'main/base.html' %}
+{% load humanize %}
+{% block content %}
+
+<h1>Fatura</h1>
+
+<table>
+    <tr>
+        <th>Descrição</th>
+        <th>Valor</th>
+    </tr>
+    <tr>
+        <td>Procedimento</td>
+        <td>{{ contrato.procedimento }}</td>
+    </tr>
+    <tr>
+        <td>Nº</td>
+        <td>{{ contrato.numero }}</td>
+    </tr>
+    <tr>
+        <td>Fornecedor</td>
+        <td>{{ contrato.fornecedor }}</td>
+    </tr>
+    <tr>
+        <td>NIF</td>
+        <td>{{ contrato.nif }}</td>
+    </tr>
+    <tr>
+        <td>Data Inicial</td>
+        <td>{{ contrato.data_inicial }}</td>
+    </tr>
+    <tr>
+        <td>Data Final</td>
+        <td>{{ contrato.data_final }}</td>
+    </tr>
+    <tr>
+        <td>Preço Contratual</td>
+        <td>{{ contrato.preco_contratual|floatformat:2|intcomma }} €</td>
+    </tr>
+    <tr>
+        <td>Valor Entregue</td>
+        <td>{{ contrato.valor_entregue|floatformat:2|intcomma }} €</td>
+    </tr>
+    <tr>
+        <td>Observações</td>
+        <td>{{ contrato.observacao }}</td>
+    </tr>
+</table>
+
+<a href="{% url 'contrato_detalhes' contrato.id %}">Voltar aos Detalhes do Contrato</a>
+
+{% endblock %}

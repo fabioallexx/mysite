@@ -31,7 +31,7 @@
         #prazo-icon {
         margin-left: 10px;
         }
-        .btn-editar, .btn-voltar, .btn-hist {
+        .btn-editar, .btn-voltar, .btn-hist, .btn-fatura {
         display: inline-block;
         padding: 10px 20px;
         margin-top: 20px;
@@ -41,10 +41,10 @@
         border-radius: 5px;
         transition: background-color 0.3s ease;
         }
-        .btn-editar:hover, .btn-voltar:hover, .btn-hist:hover {
+        .btn-editar:hover, .btn-voltar:hover, .btn-hist:hover, .btn-fatura:hover {
         background-color: var(--white);
         }
-        .btn-editar:first-of-type, .btn-voltar:first-of-type, .btn-hist:first-of-type {
+        .btn-editar:first-of-type, .btn-voltar:first-of-type, .btn-hist:first-of-type, .btn-fatura:first-of-type {
         margin-right: 10px;
         }
         p span {
@@ -86,6 +86,7 @@
 
 <a class="btn-editar" id="btn-editar" href="{% url 'contrato_info' file_id=contract.uploaded_file.id %}">Editar</a>
 <a class="btn-voltar" id="btn-voltar" href="/">Voltar</a>
+<a class="btn-fatura" id="btn-fatura" href="{% url 'fatura' contract.id %}">Emitir Fatura</a>
 <form method="POST" action="{% url 'fechar_contrato' contract.id %}">
     {% csrf_token %}
     <button type="submit" class="btn btn-danger">Fechar Contrato</button>

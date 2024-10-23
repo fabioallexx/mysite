@@ -13,4 +13,5 @@ urlpatterns = [
     path('fechar_contrato/<int:contract_id>/', views.fechar_contrato, name='fechar_contrato'),
     path('historico/', views.historico_list, name='historico'),
     path('contrato/detalhes/inativo/<int:contract_id>/', views.detalhes_contrato_inativo, name='detalhes_contrato_inativo'),
+    path('fatura/<int:contract_id>', views.fatura, name='fatura'),
 ]
