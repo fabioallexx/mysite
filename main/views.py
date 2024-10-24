@@ -4,8 +4,6 @@ from .models import UploadedFile, Contract, CadernoEncargo, Historico, Fatura
 from .forms import CreateNewList
 from datetime import datetime, date
 from dateutil.relativedelta import relativedelta
-from django.contrib import messages
-from django.core.exceptions import ValidationError
 from django.utils import timezone
 from decimal import Decimal
 
@@ -286,7 +284,7 @@ def detalhes_contrato_inativo(request, contract_id):
     contrato = get_object_or_404(Historico, id=contract_id)
     return render(request, 'main/detalhes_contrato_inativo.html', {'contrato': contrato})
 
-def fatura(request, contract_id):
+def execucao_contrato(request, contract_id):
     contrato = get_object_or_404(Contract, id=contract_id, user=request.user)
 
     data_atual = timezone.now().date()
@@ -302,4 +300,4 @@ def fatura(request, contract_id):
         'valor_sem_iva': valor_sem_iva,  
         'valor_requisitado': valor_requisitado,  
     }
-    return render(request, 'main/fatura.html', context)
+    return render(request, 'main/execucao_contrato.html', context)
