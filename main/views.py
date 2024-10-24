@@ -9,7 +9,6 @@ from django.core.exceptions import ValidationError
 from django.utils import timezone
 from decimal import Decimal
 
-
 def index(response, id):
     if response.method == "POST":
         if response.POST.get("save"):
