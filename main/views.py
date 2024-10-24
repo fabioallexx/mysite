@@ -30,11 +30,13 @@ def home(request):
             if contrato:
                 contratos_ativos.append((uf, contrato))
 
-    context = {
-        'contratos_ativos': contratos_ativos,
-        **get_global_context(request)
-    }
-    return render(request, 'main/home.html', context)
+        context = {
+            'contratos_ativos': contratos_ativos,
+            **get_global_context(request)
+        }
+        return render(request, 'main/home.html', context)
+    else:
+        return render(request, 'main/home.html', {'message': 'Por favor, faça login para ver seus contratos.'})
 
 def upload_file(request):
     if request.method == 'POST' and request.FILES.get('file'):
