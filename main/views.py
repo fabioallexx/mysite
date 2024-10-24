@@ -6,6 +6,9 @@ from datetime import datetime, date
 from dateutil.relativedelta import relativedelta
 from django.contrib import messages
 from django.core.exceptions import ValidationError
+from django.utils import timezone
+from decimal import Decimal
+
 
 def index(response, id):
     if response.method == "POST":
@@ -285,7 +288,17 @@ def detalhes_contrato_inativo(request, contract_id):
 def fatura(request, contract_id):
     contrato = get_object_or_404(Contract, id=contract_id, user=request.user)
 
+    data_atual = timezone.now().date()
+
+    valor_total = contrato.preco_contratual  
+
+    valor_sem_iva = valor_total / Decimal('1.23') if valor_total else Decimal('0.00')
+    valor_requisitado = valor_sem_iva  
+
     context = {
         'contrato': contrato,
+        'data_atual': data_atual,
+        'valor_sem_iva': valor_sem_iva,  
+        'valor_requisitado': valor_requisitado,  
     }
     return render(request, 'main/fatura.html', context)
