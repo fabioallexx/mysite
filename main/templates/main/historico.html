@@ -70,7 +70,7 @@
         <ul class="list-group">
             {% for contrato in contratos_inativos %}
                 <li class="list-group-item">
-                    <a href="{% url 'detalhes_contrato_inativo' contrato.id %}">{{ contrato.uploaded_file }} - {{ contrato.fornecedor }}</a>
+                    <a href="{% url 'detalhes_contrato_inativo' contrato.id %}">{{ contrato.objeto }} - {{ contrato.fornecedor }}</a>
                 </li>
             {% empty %}
                 <li class="list-group-item">Nenhum contrato inativo encontrado.</li>

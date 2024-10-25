@@ -10,7 +10,11 @@ def remove_all_extensions(value):
 
 @register.filter
 def format_currency(value):
-    if value is None:
-        return ""
-    formatted_value = f"{value:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
-    return f"{formatted_value} €"
+    if value is None or value == "":
+        return "Valor não disponível"
+    try:
+        float_value = float(value)
+        formatted_value = f"{float_value:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
+        return f"{formatted_value} €"
+    except (ValueError, TypeError):
+        return f"Erro ao formatar: {value}"

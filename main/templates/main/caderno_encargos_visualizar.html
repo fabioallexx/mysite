@@ -16,6 +16,26 @@
         margin: 0;
         padding: 20px;
         }
+        .btn-voltar {
+            display: inline-block;
+            padding: 10px 20px;
+            margin-top: 20px;
+            background-color: var(--primary-color);
+            color: var(--white);
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+        .btn-pdf {
+            display: inline-block;
+            padding: 10px 20px;
+            margin-top: 20px;
+            background-color: var(--primary-color);
+            color: var(--white);
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
         h1 {
             color: var(--primary-color);
             font-size: 2.5rem;
@@ -61,5 +81,6 @@
 <p><strong>Defeitos:</strong> {{ caderno.defeitos }}</p>
 <p><strong>Sugestões:</strong> {{ caderno.sugestoes }}</p>
 
-<a href="{% url 'contrato_detalhes' contract.id %}">Voltar aos Detalhes do Contrato</a>
+<a id="btn-voltar" class="btn-voltar" href="{% url 'contrato_detalhes' contract.id %}">Voltar</a>
+<a id="btn-pdf" class="btn-pdf" href="{% url 'visualizar_pdf' contract.id %}" target="_blank">Ver PDFs</a>
 {% endblock %}

@@ -51,7 +51,7 @@
         }
         .sidenav {
             height: 100%;
-            width: 160px;
+            width: 210px;
             position: fixed;
             z-index: 1;
             top: 0;
@@ -86,7 +86,7 @@
         .toggle-btn {
             position: fixed;
             top: 50%;
-            left: 160px;
+            left: 210px;
             transform: translateY(-1050%);
             background-color: #111;
             color: #fff;
@@ -121,6 +121,9 @@
 </head>
 <body>
     <div class="sidenav" id="sidenav">
+        {% if user.is_authenticated and user.is_staff %}
+        <a href="/admin/">Administração</a>
+        {% endif %}
         <a href="/">Contratos Ativos</a>
         {% if user.is_authenticated %}
         <a href="/historico">Histórico</a>
@@ -128,6 +131,12 @@
         
         {% if is_contrato_detalhes and user.is_authenticated %}
         <a href="{% url 'caderno_encargos' contract.id %}">Caderno Encargos</a>
+        <a href="{% url 'execucao_contrato' contract.id %}">Execução Contrato</a>
+        <a href="{% url 'inserir_fatura' contract.id %}">Execução Financeira</a>
+        {% endif %}
+
+        {% if faturas_existem %}
+        <a href="{% url 'lista_faturas' contract.id %}">Ver Faturas</a>
         {% endif %}
 
         <div style="position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);">
@@ -178,7 +187,7 @@
             } else {
                 sidenav.classList.remove('hidden');
                 mainContent.classList.remove('shifted');
-                toggleBtn.style.left = '160px';
+                toggleBtn.style.left = '210px';
             }
             isOpen = !isOpen;
         });

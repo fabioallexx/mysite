@@ -51,6 +51,14 @@
         font-weight: bold;
         color: var(--accent-color);
         }
+        .alert {
+        padding: 10px;
+        margin: 15px 0;
+        border: 1px solid #d4edda;
+        border-radius: 5px;
+        background-color: #d4edda;
+        color: #155724;
+        }
         @media (max-width: 768px) {
         body {
             padding: 10px;
@@ -70,27 +78,40 @@
 
 <h1>Detalhes do Contrato</h1>
 
+{% if messages %}
+    <div>
+        {% for message in messages %}
+            <div class="alert alert-success">{{ message }}</div>
+        {% endfor %}
+    </div>
+{% endif %}
+
+<p><strong>Objeto:</strong> {{ contract.objeto }}</p>
 <p><strong>Procedimento:</strong> {{ contract.procedimento }}</p>
 <p><strong>Nº:</strong> {{ contract.numero }}</p>
 <p><strong>Tipo de Contrato:</strong> {{ contract.tipo_contrato }}</p>
+<p><strong>Tipo de Produto:</strong> {{ contract.tipo_produto }}</p>
 <p><strong>Fornecedor:</strong> {{ contract.fornecedor }}</p>
 <p><strong>NIF:</strong> {{ contract.nif }}</p>
 <p><strong>Data Inicial:</strong> {{ contract.data_inicial }}</p>
 <p><strong>Data Final:</strong> {{ contract.data_final }}</p>
 <p><strong>Prazo:</strong> <span id="prazo">{{ contract.prazo }}</span> <span id="prazo-icon"></span></p>
 <p><strong>Preço Contratual:</strong> {{ contract.preco_contratual|floatformat:0|intcomma }} €</p>
-<p><strong>Observações:</strong> {{ contract.observacao }}</p>
 <p><strong>Valor Entregue:</strong> {{ contract.valor_entregue|floatformat:0|intcomma }} €</p>
+<p><strong>Valor c/IVA:</strong> {{ contract.valor_total|floatformat:0|intcomma }} €</p>
+<p><strong>Observações:</strong> {{ contract.observacao }}</p>
 <p><strong>Recorrente:</strong> {{ contract.recorrente|yesno:"Sim,Não" }}</p>
 <p><strong>Compromisso:</strong> {{ contract.compromisso|yesno:"Sim,Não" }}</p>
 
 <a class="btn-editar" id="btn-editar" href="{% url 'contrato_info' file_id=contract.uploaded_file.id %}">Editar</a>
 <a class="btn-voltar" id="btn-voltar" href="/">Voltar</a>
-<a class="btn-exec" id="btn-exec" href="{% url 'execucao_contrato' contract.id %}">Consultar Execução</a>
-<form method="POST" action="{% url 'fechar_contrato' contract.id %}">
-    {% csrf_token %}
-    <button type="submit" class="btn btn-danger">Fechar Contrato</button>
-</form>
+<!-- <a class="btn-exec" id="btn-exec" href="{% url 'execucao_contrato' contract.id %}">Consultar Execução</a> -->
+ <div style="display: flex; justify-content: flex-end;">
+    <form method="POST" action="{% url 'fechar_contrato' contract.id %}" onsubmit="return confirmarFechamento();">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger" style="text-align: right">Fechar Contrato</button>
+    </form>
+ </div>
 
 <script>
 
@@ -144,6 +165,15 @@ function updatePrazo() {
 
 setInterval(updatePrazo, 1000);
 updatePrazo();
+
+function confirmarFechamento() {
+    if (confirm("NÃO SE ESQUEÇA DE ENVIAR O RELATÓRIO PARA O APROVISIONAMENTO!")) {
+        return true;  // O formulário será enviado
+    } else {
+        return false; // O envio do formulário será cancelado
+    }
+}
+
 </script>
 
 {% endblock %}

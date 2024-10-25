@@ -117,12 +117,23 @@
         {% csrf_token %}
         
         <input type="hidden" name="user_id" value="{{ request.user.id }}">
+
+        <label for="objeto"><strong>Objeto:</strong></label>
+        <input type="text" id="objeto" name="objeto" required value="{{ objeto }}">
     
         <label for="procedimento"><strong>Procedimento:</strong></label>
         <select id="procedimento" name="procedimento">
             <option value="Consulta Prévia" {% if procedimento == "Consulta Prévia" %}selected{% endif %}>Consulta Prévia</option>
             <option value="Ajuste Direto" {% if procedimento == "Ajuste Direto" %}selected{% endif %}>Ajuste Direto</option>
             <option value="Concurso Público" {% if procedimento == "Concurso Público" %}selected{% endif %}>Concurso Público</option>
+        </select>
+
+        <label for="tipo_produto"><strong>Tipo Produto:</strong></label>
+        <select id="tipo_produto" name="tipo_produto">
+            <option value="Serviço" {% if tipo_produto == "Serviço" %}selected{% endif %}>Serviço</option>
+            <option value="Bens" {% if tipo_produto == "Bens" %}selected{% endif %}>Bens</option>
+            <option value="Misto" {% if tipo_produto == "Misto" %}selected{% endif %}>Misto</option>
+            <option value="Empreitada" {% if tipo_produto == "Empreitada" %}selected{% endif %}>Empreitada</option>
         </select>
     
         <label for="numero"><strong>Nº:</strong></label>
@@ -152,6 +163,13 @@
     
         <label for="preco_contratual"><strong>Preço Contratual:</strong></label>
         <input type="text" id="preco_contratual" name="preco_contratual" required value="{{ preco_contratual }}">
+
+        <label for="iva"><strong>IVA (%):</strong></label>
+        <select id="iva" name="iva">
+            <option value="6%" {% if tipo_contrato == "6%" %}selected{% endif %}>6%</option>
+            <option value="13%" {% if tipo_contrato == "13%" %}selected{% endif %}>13%</option>
+            <option value="23%" {% if tipo_contrato == "23%" %}selected{% endif %}>23%</option>
+        </select>
     
         <label for="observacao"><strong>Observações:</strong></label>
         <input type="text" id="observacao" name="observacao" size="60">

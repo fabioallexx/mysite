@@ -1,7 +1,7 @@
 {% extends 'main/base.html' %}
 {% load custom_filters %}
 {% block content %}
-<h1>{{ contrato.uploaded_file|capfirst|remove_all_extensions }}</h1>
+<h1>{{ contrato.objeto|capfirst|remove_all_extensions }}</h1>
 
 <li class="list-group-item">
     <p><strong>Procedimento:</strong> {{ contrato.procedimento }}</p>

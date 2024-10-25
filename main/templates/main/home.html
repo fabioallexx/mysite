@@ -4,11 +4,11 @@
 {% if user.is_authenticated %}
 <div>
     <ul style="list-style-type: disc; padding-left: 20px;">
-        {% for uf, contract in contratos_ativos %}
+        {% for uf, contrato in contratos_ativos %}
         <li class="list-group-item">
-            <a href="{% url 'contrato_detalhes' contract.id %}">
+            <a href="{% url 'contrato_detalhes' contrato.id %}">
                 <span style="font-weight: bold; font-size: 1.1em;">
-                    {{ uf.name|slice:":-4"|capfirst }}  {# Remove a extensão do arquivo e capitaliza a primeira letra #}
+                    {{ contrato.objeto }}  {# Exibe o objeto do contrato #}
                 </span>
             </a>
         </li>
@@ -24,7 +24,7 @@
         <label for="file" style="cursor: pointer; background-color: #007bff; color: white; padding: 10px 20px; border-radius: 5px;">
             Selecionar contrato
         </label>
-        <input type="file" id="file" name="file" required style="display: none;" onchange="handleFileSelect(event)">
+        <input type="file" id="file" name="file" required accept=".pdf" style="display: none;" onchange="handleFileSelect(event)">
         
         <button type="submit" id="submit-btn" disabled style="background-color: #28a745; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer;">
             Inserir
