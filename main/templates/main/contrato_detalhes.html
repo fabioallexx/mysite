@@ -11,7 +11,7 @@
     <style>
         body {
         background-color: var(--background-color);
-        font-family: 'Open Sans', sans-serif;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         color: var(--text-color);
         margin: 0;
         padding: 20px;
@@ -59,70 +59,14 @@
         background-color: #d4edda;
         color: #155724;
         }
-        
-        .modal {
-        display: none; 
-        position: fixed;
-        z-index: 1;
-        left: 0;
-        top: 0;
-        width: 100%;
-        height: 100%;
-        overflow: auto;
-        background-color: rgba(0, 0, 0, 0.5);
-    }
-
-    .modal-content {
-        background-color: #fefefe;
-        margin: 15% auto;
-        padding: 20px;
-        border: 1px solid #888;
-        width: 80%;
-        max-width: 400px;
-        border-radius: 8px;
-        text-align: center;
-    }
-
-    .modal-header {
-        font-weight: bold;
-        font-size: 1.25rem;
-        margin-bottom: 15px;
-    }
-
-    .modal-body {
-        margin-bottom: 15px;
-    }
-
-    .modal-footer {
-        display: flex;
-        justify-content: space-between;
-    }
-
-    .btn-confirm, .btn-cancel {
-        padding: 10px 20px;
-        color: #fff;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        transition: background-color 0.3s ease;
-    }
-
-    .btn-confirm {
-        background-color: #60a5fa;
-    }
-
-    .btn-cancel {
-        background-color: #1e3a8a;
-    }
-
-    .btn-confirm:hover {
-        background-color: #60a5fa;
-    }
-
-    .btn-cancel:hover {
-        background-color: #1e3a8a;
-    }
-    @media (max-width: 768px) {
+        .chart-container{
+            position:relative;
+            left:550px;
+            top:-750px;
+            width:500px;
+            height:330px;
+        }
+        @media (max-width: 768px) {
         body {
             padding: 10px;
         }
@@ -134,7 +78,7 @@
         p {
             font-size: 1rem;
         }
-    }
+        }
     </style>
 </head>
 <body>
@@ -176,39 +120,96 @@
     </form>
  </div>
 
- <div id="confirmModal" class="modal">
-    <div class="modal-content">
-        <div class="modal-header">Confirmação</div>
-        <div class="modal-body">
-            NÃO SE ESQUEÇA DE ENVIAR O RELATÓRIO PARA O APROVISIONAMENTO!
-        </div>
-        <div class="modal-footer">
-            <button class="btn-confirm" onclick="confirmClose()">Confirmar</button>
-            <button class="btn-cancel" onclick="cancelClose()">Cancelar</button>
-        </div>
-    </div>
+<div class="chart-container" >
+    <canvas id="prazoChart"></canvas>
+    <canvas id="valorChart"></canvas>
 </div>
 
-<script>
-
-const dataFinal = new Date("{{ contract.data_final|date:'Y-m-d' }}");
-
-function calcularDiferenca(dataFinal) {
+ <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+ <script>
+ const dataFinal = new Date("{{ contract.data_final|date:'Y-m-d' }}");
+ const dataInicial = new Date("{{ contract.data_inicial|date:'Y-m-d' }}");
+ 
+ function calcularDiferenca(dataFinal) {
+     const agora = new Date();
+     const diff = dataFinal - agora;
+ 
+     if (diff < 0) {
+         return { anos: -1, meses: 0, dias: 0 };
+     }
+ 
+     let anos = dataFinal.getFullYear() - agora.getFullYear();
+     let meses = dataFinal.getMonth() - agora.getMonth();
+     let dias = dataFinal.getDate() - agora.getDate();
+ 
+     if (dias < 0) {
+         meses--;
+         const ultimoDiaMes = new Date(agora.getFullYear(), agora.getMonth() + 1, 0).getDate();
+         dias += ultimoDiaMes;
+     }
+     if (meses < 0) {
+         anos--;
+         meses += 12;
+     }
+ 
+     return { anos, meses, dias };
+ }
+ 
+ function updatePrazo() {
+     const { anos, meses, dias } = calcularDiferenca(dataFinal);
+         
+     const prazoElement = document.getElementById('prazo');
+     const prazoIcon = document.getElementById('prazo-icon');
+         
+     prazoElement.innerHTML = `${anos} ano${anos !== 1 ? 's' : ''}, ${meses} mes${meses !== 1 ? 'es' : ''}, ${dias} dia${dias !== 1 ? 's' : ''}`;
+ 
+     if (anos < 0) {
+         prazoIcon.innerHTML = '🔴';
+     } else if (anos === 0 && meses === 0 && dias < 0) {
+         prazoIcon.innerHTML = '🔴';
+     } else if (anos === 0 && meses === 0) {
+         prazoIcon.innerHTML = '🟡';
+     } else if (anos === 0) {
+         prazoIcon.innerHTML = '🟢';
+     } else {
+         prazoIcon.innerHTML = '⚪';
+     }
+ 
+     updateChart();
+ }
+ 
+ function updateChart() {
     const agora = new Date();
-    const diff = dataFinal - agora;
+    const totalTime = dataFinal - dataInicial;
+    const elapsedTime = agora - dataInicial;
+    const remainingTime = totalTime - elapsedTime;
 
-    if (diff < 0) {
-        return { anos: -1, meses: 0, dias: 0 };
-    }
+    const elapsed = calculateYearsMonthsDays(elapsedTime);
+    const remaining = calculateYearsMonthsDays(remainingTime);
 
-    let anos = dataFinal.getFullYear() - agora.getFullYear();
-    let meses = dataFinal.getMonth() - agora.getMonth();
-    let dias = dataFinal.getDate() - agora.getDate();
+    prazoChart.data.labels = [
+        `Tempo Decorrido: ${elapsed.anos} ano(s), ${elapsed.meses} mes(es), ${elapsed.dias} dia(s)`,
+        `Tempo Restante: ${remaining.anos} ano(s), ${remaining.meses} mes(es), ${remaining.dias} dia(s)`
+    ];
+
+    prazoChart.data.datasets[0].data = [
+        elapsedTime > 0 ? elapsedTime : 0,
+        remainingTime > 0 ? remainingTime : 0
+    ];
+    prazoChart.update();
+}
+
+function calculateYearsMonthsDays(milliseconds) {
+    const agora = new Date();
+    const targetDate = new Date(agora.getTime() + milliseconds);
+
+    let anos = targetDate.getFullYear() - agora.getFullYear();
+    let meses = targetDate.getMonth() - agora.getMonth();
+    let dias = targetDate.getDate() - agora.getDate();
 
     if (dias < 0) {
         meses--;
-        const ultimoDiaMes = new Date(agora.getFullYear(), agora.getMonth() + 1, 0).getDate();
-        dias += ultimoDiaMes;
+        dias += new Date(agora.getFullYear(), agora.getMonth() + 1, 0).getDate(); // days in the last month
     }
     if (meses < 0) {
         anos--;
@@ -218,49 +219,70 @@ function calcularDiferenca(dataFinal) {
     return { anos, meses, dias };
 }
 
-function updatePrazo() {
-    const { anos, meses, dias } = calcularDiferenca(dataFinal);
-        
-    const prazoElement = document.getElementById('prazo');
-    const prazoIcon = document.getElementById('prazo-icon');
-        
-    prazoElement.innerHTML = `${anos} ano${anos !== 1 ? 's' : ''}, ${meses} mes${meses !== 1 ? 'es' : ''}, ${dias} dia${dias !== 1 ? 's' : ''}`;
-
-    if (anos < 0) {
-        prazoIcon.innerHTML = '🔴';
-    } else if (anos === 0 && meses === 0 && dias < 0) {
-        prazoIcon.innerHTML = '🔴';
-    } else if (anos === 0 && meses === 0) {
-        prazoIcon.innerHTML = '🟡';
-    } else if (anos === 0) {
-        prazoIcon.innerHTML = '🟢';
-    } else {
-        prazoIcon.innerHTML = '⚪';
-    }
-}
+const prazoChartCtx = document.getElementById('prazoChart').getContext('2d');
+const prazoChart = new Chart(prazoChartCtx, {
+    type: 'pie',
+    data: {
+        labels: ['Tempo Decorrido', 'Tempo Restante'],
+        datasets: [{
+            data: [0, 0],
+            backgroundColor: ['#ffa500', '#60a5fa'],
+            borderWidth: 1,
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: {
+                position: 'top',
+            },
+        },
+    },
+});
 
 setInterval(updatePrazo, 1000);
 updatePrazo();
 
-function confirmarFechamento() {
-    const modal = document.getElementById("confirmModal");
-    modal.style.display = "block";
-    return false; 
+function updateValorChart() {
+    const valorTotal = parseFloat("{{ contract.valor_total }}");
+const valorEntregue = parseFloat("{{ contract.valor_entregue }}");
+    const valorRestante = valorTotal - valorEntregue;
+
+    valorChart.data.labels = [
+        `Valor Entregue: ${valorEntregue.toLocaleString('pt-PT', { style: 'currency', currency: 'EUR' })}`,
+        `Valor Restante: ${valorRestante.toLocaleString('pt-PT', { style: 'currency', currency: 'EUR' })}`
+    ];
+
+    valorChart.data.datasets[0].data = [
+        valorEntregue > 0 ? valorEntregue : 0,
+        valorRestante > 0 ? valorRestante : 0
+    ];
+    valorChart.update();
 }
 
-function confirmClose() {
-    document.querySelector("form").submit(); 
-    closeModal();
-}
+const valorChartCtx = document.getElementById('valorChart').getContext('2d');
+const valorChart = new Chart(valorChartCtx, {
+    type: 'pie',
+    data: {
+        labels: ['Valor Entregue', 'Valor Restante'],
+        datasets: [{
+            data: [0, 0],
+            backgroundColor: ['#34d399', '#f87171'],
+            borderWidth: 1,
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: {
+                position: 'top',
+            },
+        },
+    },
+});
 
-function cancelClose() {
-    closeModal(); 
-}
-
-function closeModal() {
-    const modal = document.getElementById("confirmModal");
-    modal.style.display = "none";
-}
+updateValorChart();
+ 
 </script>
 
 {% endblock %}
