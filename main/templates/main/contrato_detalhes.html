@@ -59,7 +59,70 @@
         background-color: #d4edda;
         color: #155724;
         }
-        @media (max-width: 768px) {
+        
+        .modal {
+        display: none; 
+        position: fixed;
+        z-index: 1;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.5);
+    }
+
+    .modal-content {
+        background-color: #fefefe;
+        margin: 15% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%;
+        max-width: 400px;
+        border-radius: 8px;
+        text-align: center;
+    }
+
+    .modal-header {
+        font-weight: bold;
+        font-size: 1.25rem;
+        margin-bottom: 15px;
+    }
+
+    .modal-body {
+        margin-bottom: 15px;
+    }
+
+    .modal-footer {
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .btn-confirm, .btn-cancel {
+        padding: 10px 20px;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    .btn-confirm {
+        background-color: #60a5fa;
+    }
+
+    .btn-cancel {
+        background-color: #1e3a8a;
+    }
+
+    .btn-confirm:hover {
+        background-color: #60a5fa;
+    }
+
+    .btn-cancel:hover {
+        background-color: #1e3a8a;
+    }
+    @media (max-width: 768px) {
         body {
             padding: 10px;
         }
@@ -71,7 +134,7 @@
         p {
             font-size: 1rem;
         }
-        }
+    }
     </style>
 </head>
 <body>
@@ -112,6 +175,19 @@
         <button type="submit" class="btn btn-danger" style="text-align: right">Fechar Contrato</button>
     </form>
  </div>
+
+ <div id="confirmModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">Confirmação</div>
+        <div class="modal-body">
+            NÃO SE ESQUEÇA DE ENVIAR O RELATÓRIO PARA O APROVISIONAMENTO!
+        </div>
+        <div class="modal-footer">
+            <button class="btn-confirm" onclick="confirmClose()">Confirmar</button>
+            <button class="btn-cancel" onclick="cancelClose()">Cancelar</button>
+        </div>
+    </div>
+</div>
 
 <script>
 
@@ -167,13 +243,24 @@ setInterval(updatePrazo, 1000);
 updatePrazo();
 
 function confirmarFechamento() {
-    if (confirm("NÃO SE ESQUEÇA DE ENVIAR O RELATÓRIO PARA O APROVISIONAMENTO!")) {
-        return true;  // O formulário será enviado
-    } else {
-        return false; // O envio do formulário será cancelado
-    }
+    const modal = document.getElementById("confirmModal");
+    modal.style.display = "block";
+    return false; 
 }
 
+function confirmClose() {
+    document.querySelector("form").submit(); 
+    closeModal();
+}
+
+function cancelClose() {
+    closeModal(); 
+}
+
+function closeModal() {
+    const modal = document.getElementById("confirmModal");
+    modal.style.display = "none";
+}
 </script>
 
 {% endblock %}
