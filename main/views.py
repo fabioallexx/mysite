@@ -29,7 +29,7 @@ def home(request):
         for uf in request.user.uploadedfile.all():
             contrato = uf.contract_set.filter(estado=True).first()
             if contrato:
-                contratos_ativos.append((uf, contrato))  # Removendo o objeto aqui, pois não é necessário
+                contratos_ativos.append((uf, contrato))
 
         context = {
             'contratos_ativos': contratos_ativos,
