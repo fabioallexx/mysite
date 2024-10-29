@@ -166,6 +166,7 @@
 
         <label for="iva"><strong>IVA (%):</strong></label>
         <select id="iva" name="iva">
+            <option value="0%" {% if tipo_contrato == "0%" %}selected{% endif %}>0%</option>
             <option value="6%" {% if tipo_contrato == "6%" %}selected{% endif %}>6%</option>
             <option value="13%" {% if tipo_contrato == "13%" %}selected{% endif %}>13%</option>
             <option value="23%" {% if tipo_contrato == "23%" %}selected{% endif %}>23%</option>
