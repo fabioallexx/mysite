@@ -102,7 +102,6 @@
         const valorField = document.getElementById('valor');
         const valor = parseFloat(valorField.value) || 0;
 
-        // Obter os valores diretamente do template Django
         const valorEntregue = parseFloat("{{ contract.valor_entregue|floatformat:'0.2f' }}");
         const valorTotal = parseFloat("{{ contract.valor_total|floatformat:'0.2f' }}");
 

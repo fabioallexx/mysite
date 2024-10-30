@@ -270,7 +270,6 @@ def gerar_plurianual(data_inicial, data_final):
 def fechar_contrato(request, contract_id):
     contrato = get_object_or_404(Contract, id=contract_id, user=request.user)
 
-    # Criar o histórico
     historico = Historico(
         user=contrato.user,
         objeto=contrato.objeto,
@@ -296,7 +295,6 @@ def fechar_contrato(request, contract_id):
     )
     historico.save()
 
-    # Remover o contrato
     contrato.delete()
 
     return redirect('home')
@@ -347,7 +345,6 @@ def inserir_fatura(request, contract_id):
 
         valor = Decimal(valor_str) if valor_str else Decimal('0.00')
 
-        # Verifica se a soma do valor da fatura e do valor já entregue não ultrapassa o valor total do contrato
         if contract.valor_entregue + valor > contract.valor_total:
             max_valor = contract.valor_total - contract.valor_entregue
             return render(request, 'main/execucao_financeira.html', {
@@ -355,7 +352,6 @@ def inserir_fatura(request, contract_id):
                 'error': f"A soma do valor da fatura e do valor entregue não pode ultrapassar o valor total do contrato. O valor máximo que pode ser inserido é {max_valor:.2f} €."
             })
 
-        # Se a validação passar, salva a fatura
         fatura = Fatura(
             user=request.user,
             contract=contract,
@@ -366,7 +362,6 @@ def inserir_fatura(request, contract_id):
         )
         fatura.save()
 
-        # Atualiza o valor entregue no contrato
         contract.valor_entregue += valor
         contract.save()
 
