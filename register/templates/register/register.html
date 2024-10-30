@@ -4,10 +4,12 @@
 {% load crispy_forms_tags %}
 
 {% block content %}
-{% if user.is_authenticated and user.is_staff %}
+{% if not user.is_authenticated or not user.is_staff %}
+    <p>Você não tem permissão para acessar esta página.</p>
+{% else %}
     <form method="POST" class="form-group">
         {% csrf_token %}
-	    {{ form|crispy }}
+        {{ form|crispy }}
         <button type="submit" class="btn btn-success">Registar</button>
     </form>
 {% endif %}
