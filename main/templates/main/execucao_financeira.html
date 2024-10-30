@@ -63,7 +63,7 @@
     </style>
 
 <!-- <h1>Fatura</h1> -->
-<form action="{% url 'inserir_fatura' contract.id %}" method="POST">
+<form id="faturaForm" action="{% url 'inserir_fatura' contract.id %}" method="POST">
     {% csrf_token %}
     <table class="tabela">
         <thead>
@@ -79,16 +79,44 @@
         </thead>
         <tbody>
             <tr>
-                <td><input type="text" id="numero" name="numero" pattern="\d+" title="Apenas números" required value="{{ numero }}"></td>
-                <td><input type="date" id="data" name="data" required value="{{ data }}"></td>
-                <td><input type="text" id="valor" name="valor" size="50" required value="{{ valor }}"></td>
-                <td><input type="text" id="mydoc" name="mydoc" size="50" value="{{ mydoc }}"></td>
+                <td><input type="text" id="numero" name="numero" pattern="\d+" title="Apenas números" required></td>
+                <td><input type="date" id="data" name="data" required></td>
+                <td>
+                    <input type="text" id="valor" name="valor" size="30" required>
+                    <span id="valorError" style="color: red;"></span>
+                </td>
+                <td><input type="text" id="mydoc" name="mydoc" size="30"></td>
             </tr>
         </tbody>
     </table>
     <a class="btn-vdetalhes" id="btn-vdetalhes" href="{% url 'contrato_detalhes' contract.id %}">Voltar</a>
     <button type="submit" class="btn-add" id="btn-add">Inserir Fatura</button>
 </form>
+
+{% if error %}
+    <div style="color: red;">{{ error }}</div>
+{% endif %}
+
+<script>
+    document.getElementById('faturaForm').onsubmit = function(event) {
+        const valorField = document.getElementById('valor');
+        const valor = parseFloat(valorField.value) || 0;
+
+        // Obter os valores diretamente do template Django
+        const valorEntregue = parseFloat("{{ contract.valor_entregue|floatformat:'0.2f' }}");
+        const valorTotal = parseFloat("{{ contract.valor_total|floatformat:'0.2f' }}");
+
+        const valorMaximo = (valorTotal - valorEntregue).toFixed(2);
+
+        if (valor > valorMaximo) {
+            event.preventDefault();
+            document.getElementById('valorError').textContent = `O valor máximo que pode ser inserido é ${valorMaximo} €`;
+        } else {
+            document.getElementById('valorError').textContent = ''; // Limpa mensagem de erro
+        }
+    };
+</script>
+
 <!-- <a class="btn-guardar" id="btn-guardar" href="#" onclick="gerarPDF()">Inserir Fatura</a>
 
 <script>

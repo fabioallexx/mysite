@@ -1,8 +1,8 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse, HttpResponseRedirect, FileResponse
 from .models import UploadedFile, Contract, CadernoEncargo, Historico, Fatura
-from .forms import CreateNewList
 from datetime import datetime, date
+from django.contrib import messages
 from dateutil.relativedelta import relativedelta
 from django.utils import timezone
 from decimal import Decimal
@@ -347,6 +347,15 @@ def inserir_fatura(request, contract_id):
 
         valor = Decimal(valor_str) if valor_str else Decimal('0.00')
 
+        # Verifica se a soma do valor da fatura e do valor já entregue não ultrapassa o valor total do contrato
+        if contract.valor_entregue + valor > contract.valor_total:
+            max_valor = contract.valor_total - contract.valor_entregue
+            return render(request, 'main/execucao_financeira.html', {
+                'contract': contract,
+                'error': f"A soma do valor da fatura e do valor entregue não pode ultrapassar o valor total do contrato. O valor máximo que pode ser inserido é {max_valor:.2f} €."
+            })
+
+        # Se a validação passar, salva a fatura
         fatura = Fatura(
             user=request.user,
             contract=contract,
@@ -357,9 +366,11 @@ def inserir_fatura(request, contract_id):
         )
         fatura.save()
 
+        # Atualiza o valor entregue no contrato
         contract.valor_entregue += valor
         contract.save()
 
+        messages.success(request, "Fatura inserida com sucesso.")
         return redirect('contrato_detalhes', contract_id=contract.id)
 
     return render(request, 'main/execucao_financeira.html', {'contract': contract})

@@ -4,9 +4,11 @@
 {% load crispy_forms_tags %}
 
 {% block content %}
+{% if user.is_authenticated and user.is_staff %}
     <form method="POST" class="form-group">
         {% csrf_token %}
 	    {{ form|crispy }}
         <button type="submit" class="btn btn-success">Registar</button>
     </form>
+{% endif %}
 {% endblock %}
