@@ -5,7 +5,7 @@ from datetime import datetime, date
 from django.contrib import messages
 from dateutil.relativedelta import relativedelta
 from django.utils import timezone
-from decimal import Decimal
+from decimal import Decimal, InvalidOperation
 import mimetypes
 from django.contrib.auth.decorators import login_required
 import os
@@ -244,7 +244,7 @@ def caderno_encargos(request, contract_id):
             'procedimento_n': contract.numero,
             'contrato_celebrado': contract.data_inicial,
             'periodo_vigencia': calcular_diferenca(contract.data_inicial, contract.data_final),
-            'valor_contrato': contract.preco_contratual,
+            'valor_contrato': contract.valor_total,
             'fornecedor': contract.fornecedor,
             'nif': contract.nif,
         }
@@ -340,10 +340,16 @@ def inserir_fatura(request, contract_id):
     if request.method == 'POST':
         numero = request.POST.get('numero')
         data = request.POST.get('data')
-        valor_str = request.POST.get('valor')
+        valor_str = request.POST.get('valor', '').replace('€', '').replace('.', '').replace(',', '.').strip()  # Limpeza do valor
         mydoc = request.POST.get('mydoc')
 
-        valor = Decimal(valor_str) if valor_str else Decimal('0.00')
+        try:
+            valor = Decimal(valor_str) if valor_str else Decimal('0.00')
+        except (ValueError, InvalidOperation):
+            return render(request, 'main/execucao_financeira.html', {
+                'contract': contract,
+                'error': "Valor inválido. Por favor, insira um valor numérico válido."
+            })
 
         if contract.valor_entregue + valor > contract.valor_total:
             max_valor = contract.valor_total - contract.valor_entregue

@@ -98,22 +98,68 @@
 {% endif %}
 
 <script>
-    document.getElementById('faturaForm').onsubmit = function(event) {
-        const valorField = document.getElementById('valor');
-        const valor = parseFloat(valorField.value) || 0;
+    function formatCurrency(input) {
+        let value = input.value.replace(/[^\d,€]/g, '').replace('€', '').trim();
 
-        const valorEntregue = parseFloat("{{ contract.valor_entregue|floatformat:'0.2f' }}");
-        const valorTotal = parseFloat("{{ contract.valor_total|floatformat:'0.2f' }}");
-
-        const valorMaximo = (valorTotal - valorEntregue).toFixed(2);
-
-        if (valor > valorMaximo) {
-            event.preventDefault();
-            document.getElementById('valorError').textContent = `O valor máximo que pode ser inserido é ${valorMaximo} €`;
-        } else {
-            document.getElementById('valorError').textContent = ''; // Limpa mensagem de erro
+        if ((value.match(/,/g) || []).length > 1) {
+            value = value.replace(/,/g, '');
         }
-    };
+
+        let parts = value.split(',');
+        parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+
+        let formattedValue = parts.join(',');
+        if (formattedValue !== '') {
+            formattedValue += ' €';
+        }
+        input.value = formattedValue;
+
+        setTimeout(() => {
+            input.setSelectionRange(formattedValue.length - 2, formattedValue.length - 2);
+        }, 0);
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const valorField = document.getElementById('valor');
+
+        valorField.addEventListener('input', function () {
+            formatCurrency(valorField);
+        });
+
+        valorField.addEventListener('focus', function () {
+            valorField.value = valorField.value.replace(' €', '');
+        });
+
+        document.getElementById('faturaForm').onsubmit = function(event) {
+            let valor = valorField.value
+                .replace(/[^\d,]/g, '')  // Remove tudo exceto números e vírgulas
+                .replace(',', '.')        // Substitui a vírgula por ponto
+                .trim();                 // Remove espaços em branco
+
+            // Remover o símbolo de euro
+            valor = valor.replace('€', '').trim();
+
+            // Verifica se o valor está vazio após o processamento
+            if (valor === '' || isNaN(valor)) {
+                event.preventDefault();
+                document.getElementById('valorError').textContent = 'Valor inválido.';
+                return;
+            }
+
+            const valorFloat = parseFloat(valor);
+            const valorEntregue = parseFloat("{{ contract.valor_entregue|floatformat:'0.2f' }}");
+            const valorTotal = parseFloat("{{ contract.valor_total|floatformat:'0.2f' }}");
+
+            const valorMaximo = (valorTotal - valorEntregue).toFixed(2);
+
+            if (valorFloat > valorMaximo) {
+                event.preventDefault();
+                document.getElementById('valorError').textContent = `O valor máximo que pode ser inserido é ${valorMaximo} €`;
+            } else {
+                document.getElementById('valorError').textContent = ''; // Limpa mensagem de erro
+            }
+        };
+    });
 </script>
 
 <!-- <a class="btn-guardar" id="btn-guardar" href="#" onclick="gerarPDF()">Inserir Fatura</a>
