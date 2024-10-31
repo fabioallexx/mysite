@@ -8,6 +8,7 @@ from django.utils import timezone
 from decimal import Decimal, InvalidOperation
 import mimetypes
 from django.contrib.auth.decorators import login_required
+from xhtml2pdf import pisa
 import os
 
 def index(response, id):
@@ -402,3 +403,62 @@ def visualizar_pdf(request, contract_id):
         return response
     else:
         return HttpResponse("Arquivo não encontrado.", status=404)
+
+def render_to_pdf(template_src, context_dict={}):
+    """Renderiza o HTML para PDF."""
+    from django.template import Context
+    from django.template.loader import get_template
+
+    template = get_template(template_src)
+    html = template.render(context_dict)
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="relatorio_contrato.pdf"'
+    pisa_status = pisa.CreatePDF(html, dest=response)
+    if pisa_status.err:
+        return HttpResponse('Erro ao gerar o PDF.')
+    return response
+
+def generate_pdf(request):
+    if request.method == 'POST':
+        pass
+    elif request.method == 'GET':
+        caderno_id = request.GET.get('caderno_id')
+        caderno = get_object_or_404(CadernoEncargo, id=caderno_id, user=request.user)
+
+        context = {
+            'caderno_data': {
+                'procedimento_n': caderno.procedimento_n,
+                'contrato_celebrado': caderno.contrato_celebrado,
+                'periodo_vigencia': caderno.periodo_vigencia,
+                'valor_contrato': caderno.valor_contrato,
+                'fornecedor': caderno.fornecedor,
+                'nif': caderno.nif,
+                'cumprimento_prazo': caderno.cumprimento_prazo,
+                'penalidade': caderno.penalidade,
+                'justificar_prazo': caderno.justificar_prazo,
+                'defeitos': caderno.defeitos,
+                'sugestoes': caderno.sugestoes,
+            }
+        }
+        return render_to_pdf('main/template_relatorio.html', context)
+    return redirect('/')
+
+def gerar_pdf_caderno(request, caderno_id):
+    caderno = get_object_or_404(CadernoEncargo, id=caderno_id, user=request.user)
+    
+    context = {
+        'caderno_data': {
+            'procedimento_n': caderno.procedimento_n,
+            'contrato_celebrado': caderno.contrato_celebrado,
+            'periodo_vigencia': caderno.periodo_vigencia,
+            'valor_contrato': caderno.valor_contrato,
+            'fornecedor': caderno.fornecedor,
+            'nif': caderno.nif,
+            'cumprimento_prazo': caderno.cumprimento_prazo,
+            'penalidade': caderno.penalidade,
+            'justificar_prazo': caderno.justificar_prazo,
+            'defeitos': caderno.defeitos,
+            'sugestoes': caderno.sugestoes,
+        }
+    }
+    return render_to_pdf('main/template_relatorio.html', context)

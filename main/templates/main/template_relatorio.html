@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            line-height: 1.5;
+            color: #333;
+        }
+        h1 {
+            text-align: center;
+            color: #007BFF;
+            margin-bottom: 20px;
+        }
+        h2 {
+            color: #0056b3;
+            margin-top: 20px;
+        }
+        p {
+            margin: 5px 0;
+        }
+        .section {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        .note {
+            font-weight: bold;
+            margin-top: 20px;
+        }
+        hr {
+            margin-top: 20px;
+            border: 1px solid #000;
+            width: 10px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>Relatório de Gestão de Contrato</h1>
+
+    <div class="section">
+        <h2>Identificação do Contrato</h2>
+        <p><strong>Procedimento Aquisitivo Nº:</strong> {{ caderno_data.procedimento_n }}</p>
+        <p><strong>Contrato Celebrado em:</strong> {{ caderno_data.contrato_celebrado }}</p>
+        <p><strong>Período de Vigência:</strong> {{ caderno_data.periodo_vigencia }}</p>
+        <p><strong>Valor do Contrato:</strong> {{ caderno_data.valor_contrato }}</p>
+        <p><strong>Fornecedor:</strong> {{ caderno_data.fornecedor }}</p>
+        <p><strong>NIF:</strong> {{ caderno_data.nif }}</p>
+    </div>
+
+    <div class="section">
+        <h2>Avaliação dos Serviços Executados</h2>
+        
+        <p><strong>Cumprimento do Prazo:</strong> 
+            {% if caderno_data.cumprimento_prazo == True %}
+                Sim
+            {% else %}
+                Não
+            {% endif %}
+        </p>
+
+        <p><strong>Penalidade:</strong> 
+            {% if caderno_data.penalidade == True %}
+                Sim
+            {% else %}
+                Não
+            {% endif %}
+        </p>
+        
+        {% if caderno_data.penalidade == False %}
+            <p><strong>Justificativa:</strong> {{ caderno_data.justificar_prazo }}</p>
+        {% endif %}
+        
+        <p><strong>Desvios, Defeitos ou Anomalias Detetadas:</strong> {{ caderno_data.defeitos }}</p>
+        <p><strong>Observações/Sugestões/Comentários:</strong> {{ caderno_data.sugestoes }}</p>
+    </div>
+
+    <div id="current-date" style="margin-top: 20px; font-weight: bold;"></div>
+
+    <hr style="margin-top: 20px; border: 1px solid #000; width: 200px; margin-left: auto; margin-right: auto;">
+    <label style="display: block; margin-top: 5px; text-align: center; font-weight: bold;">O Gestor de Contrato</label>
+
+    <div class="note">
+        <p><strong>Nota:</strong></p>
+        <p>O gestor do contrato deve remeter o presente relatório via email para o Gabinete de Aprovisionamento (gab.aprovisionamento@cm-moita.pt) no prazo máximo de 10 dias úteis após a conferência/validação da última fatura do contrato.</p>
+    </div>
+
+    <script>
+        window.onload = function() {
+            displayCurrentDate();
+        };
+
+        function displayCurrentDate() {
+            const date = new Date();
+            const options = { day: 'numeric', month: 'long', year: 'numeric', locale: 'pt-PT' };
+            const formattedDate = date.toLocaleDateString('pt-PT', options);
+            const dateContainer = document.getElementById('current-date');
+            dateContainer.textContent = `Moita, ${formattedDate}`;
+        }
+    </script>
+</body>
+</html>
