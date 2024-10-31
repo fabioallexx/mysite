@@ -2,6 +2,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse, HttpResponseRedirect, FileResponse
 from .models import UploadedFile, Contract, CadernoEncargo, Historico, Fatura
 from datetime import datetime, date
+import locale
 from django.contrib import messages
 from dateutil.relativedelta import relativedelta
 from django.utils import timezone
@@ -9,6 +10,8 @@ from decimal import Decimal, InvalidOperation
 import mimetypes
 from django.contrib.auth.decorators import login_required
 from xhtml2pdf import pisa
+from django.template import Context
+from django.template.loader import get_template
 import os
 
 def index(response, id):
@@ -406,8 +409,6 @@ def visualizar_pdf(request, contract_id):
 
 def render_to_pdf(template_src, context_dict={}):
     """Renderiza o HTML para PDF."""
-    from django.template import Context
-    from django.template.loader import get_template
 
     template = get_template(template_src)
     html = template.render(context_dict)
@@ -418,33 +419,11 @@ def render_to_pdf(template_src, context_dict={}):
         return HttpResponse('Erro ao gerar o PDF.')
     return response
 
-def generate_pdf(request):
-    if request.method == 'POST':
-        pass
-    elif request.method == 'GET':
-        caderno_id = request.GET.get('caderno_id')
-        caderno = get_object_or_404(CadernoEncargo, id=caderno_id, user=request.user)
-
-        context = {
-            'caderno_data': {
-                'procedimento_n': caderno.procedimento_n,
-                'contrato_celebrado': caderno.contrato_celebrado,
-                'periodo_vigencia': caderno.periodo_vigencia,
-                'valor_contrato': caderno.valor_contrato,
-                'fornecedor': caderno.fornecedor,
-                'nif': caderno.nif,
-                'cumprimento_prazo': caderno.cumprimento_prazo,
-                'penalidade': caderno.penalidade,
-                'justificar_prazo': caderno.justificar_prazo,
-                'defeitos': caderno.defeitos,
-                'sugestoes': caderno.sugestoes,
-            }
-        }
-        return render_to_pdf('main/template_relatorio.html', context)
-    return redirect('/')
-
 def gerar_pdf_caderno(request, caderno_id):
+    locale.setlocale(locale.LC_TIME, 'pt_PT.UTF-8')  # Define o locale para português
     caderno = get_object_or_404(CadernoEncargo, id=caderno_id, user=request.user)
+
+    current_date = datetime.now().strftime('%d de %B de %Y')
     
     context = {
         'caderno_data': {
@@ -459,6 +438,7 @@ def gerar_pdf_caderno(request, caderno_id):
             'justificar_prazo': caderno.justificar_prazo,
             'defeitos': caderno.defeitos,
             'sugestoes': caderno.sugestoes,
+            'current_date': current_date  # Adiciona a data ao contexto
         }
     }
     return render_to_pdf('main/template_relatorio.html', context)

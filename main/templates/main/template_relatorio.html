@@ -1,3 +1,7 @@
+{% load custom_filters %}
+{% load humanize %}
+{% block content %}
+
 <!DOCTYPE html>
 <html lang="pt-PT">
 <head>
@@ -34,7 +38,7 @@
         hr {
             margin-top: 20px;
             border: 1px solid #000;
-            width: 10px;
+            width: 50px;
             margin-left: auto;
             margin-right: auto;
         }
@@ -48,7 +52,7 @@
         <p><strong>Procedimento Aquisitivo Nº:</strong> {{ caderno_data.procedimento_n }}</p>
         <p><strong>Contrato Celebrado em:</strong> {{ caderno_data.contrato_celebrado }}</p>
         <p><strong>Período de Vigência:</strong> {{ caderno_data.periodo_vigencia }}</p>
-        <p><strong>Valor do Contrato:</strong> {{ caderno_data.valor_contrato }}</p>
+        <p><strong>Valor do Contrato:</strong> {{ caderno_data.valor_contrato|format_currency }}</p>
         <p><strong>Fornecedor:</strong> {{ caderno_data.fornecedor }}</p>
         <p><strong>NIF:</strong> {{ caderno_data.nif }}</p>
     </div>
@@ -80,28 +84,16 @@
         <p><strong>Observações/Sugestões/Comentários:</strong> {{ caderno_data.sugestoes }}</p>
     </div>
 
-    <div id="current-date" style="margin-top: 20px; font-weight: bold;"></div>
+    <div id="current-date" style="margin-top: 20px; font-weight: bold;">Moita, {{ caderno_data.current_date }}</div>
 
-    <hr style="margin-top: 20px; border: 1px solid #000; width: 200px; margin-left: auto; margin-right: auto;">
+    <hr style="margin-top: 20px; border: 1px solid black; width: 100px; margin-left: auto; margin-right: auto;">
     <label style="display: block; margin-top: 5px; text-align: center; font-weight: bold;">O Gestor de Contrato</label>
 
     <div class="note">
         <p><strong>Nota:</strong></p>
         <p>O gestor do contrato deve remeter o presente relatório via email para o Gabinete de Aprovisionamento (gab.aprovisionamento@cm-moita.pt) no prazo máximo de 10 dias úteis após a conferência/validação da última fatura do contrato.</p>
     </div>
-
-    <script>
-        window.onload = function() {
-            displayCurrentDate();
-        };
-
-        function displayCurrentDate() {
-            const date = new Date();
-            const options = { day: 'numeric', month: 'long', year: 'numeric', locale: 'pt-PT' };
-            const formattedDate = date.toLocaleDateString('pt-PT', options);
-            const dateContainer = document.getElementById('current-date');
-            dateContainer.textContent = `Moita, ${formattedDate}`;
-        }
-    </script>
 </body>
 </html>
+
+{% endblock %}
