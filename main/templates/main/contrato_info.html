@@ -153,10 +153,10 @@
         <input type="text" id="nif" name="nif" pattern="\d{9}" maxlength="9" title="Apenas 9 números" required value="{{ nif }}">
     
         <label for="data_inicial"><strong>Data Inicial:</strong></label>
-        <input type="date" id="data_inicial" name="data_inicial" required value="{{ data_inicial }}">
+        <input type="date" id="data_inicial" name="data_inicial" required value="{{ data_inicial|date:'Y-m-d' }}">
     
         <label for="data_final"><strong>Data Final:</strong></label>
-        <input type="date" id="data_final" name="data_final" required value="{{ data_final }}">
+        <input type="date" id="data_final" name="data_final" required value="{{ data_final|date:'Y-m-d' }}">
     
         <label for="prazo"><strong>Prazo:</strong></label>
         <input type="text" id="prazo" name="prazo" size="20" readonly style="background-color: #e9ecef; margin-right: 15px;" value="{{ prazo }}">
@@ -214,54 +214,54 @@
     <script>
         function formatCurrency(input) {
             let value = input.value.replace(/[^\d,€]/g, '').replace('€', '').trim();
-
+    
             if ((value.match(/,/g) || []).length > 1) {
                 value = value.replace(/,/g, '');
             }
-
+    
             let parts = value.split(',');
             parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-
+    
             let formattedValue = parts.join(',');
             if (formattedValue !== '') {
                 formattedValue += ' €';
             }
             input.value = formattedValue;
-
+    
             setTimeout(() => {
                 input.setSelectionRange(formattedValue.length - 2, formattedValue.length - 2);
             }, 0);
         }
-
+    
         document.addEventListener('DOMContentLoaded', function () {
             const precoInput = document.getElementById('preco_contratual');
             const valorEntregueInput = document.getElementById('valor_entregue');
-
+    
             precoInput.addEventListener('input', function () {
                 formatCurrency(precoInput);
             });
-
+    
             precoInput.addEventListener('focus', function () {
                 precoInput.value = precoInput.value.replace(' €', '');
             });
-
+    
             valorEntregueInput.addEventListener('input', function () {
                 formatCurrency(valorEntregueInput);
             });
-
+    
             valorEntregueInput.addEventListener('focus', function () {
                 valorEntregueInput.value = valorEntregueInput.value.replace(' €', '');
             });
-
+    
             const dataInicial = document.getElementById('data_inicial');
             const dataFinal = document.getElementById('data_final');
             const plurianualDiv = document.getElementById('plurianual');
-
+    
             function calcularPrazo() {
                 const inicial = new Date(dataInicial.value);
                 const final = new Date(dataFinal.value);
                 const prazoInput = document.getElementById('prazo');
-
+    
                 if (!isNaN(inicial) && !isNaN(final)) {
                     const umAno = 365 * 24 * 60 * 60 * 1000;
                     const umMes = 30 * 24 * 60 * 60 * 1000;
@@ -284,7 +284,7 @@
                     prazoInput.value = '';
                 }
             }
-
+    
             function calcularPlurianual() {
                 const inicial = new Date(dataInicial.value);
                 const final = new Date(dataFinal.value);
@@ -295,7 +295,7 @@
                     for (let year = inicial.getFullYear(); year <= final.getFullYear(); year++) {
                         anos.push(year);
                     }
-
+    
                     anos.forEach(year => {
                         const yearDiv = document.createElement('div');
                         yearDiv.style.border = "1px solid #ccc";
@@ -305,12 +305,15 @@
                     });
                 }
             }
-
+    
+            calcularPrazo();
+            calcularPlurianual();
+    
             dataInicial.addEventListener('input', function() {
                 calcularPrazo();
                 calcularPlurianual();
             });
-
+    
             dataFinal.addEventListener('input', function() {
                 calcularPrazo();
                 calcularPlurianual();

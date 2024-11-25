@@ -67,7 +67,7 @@
         }
     </style>
 </head>
-<h1>Caderno de Encargos - Visualização</h1>
+<h1>Relatório - Gestor do Contrato</h1>
 
 <p><strong>Procedimento Aquisitivo Nº:</strong> {{ caderno.procedimento_n }}</p>
 <p><strong>Contrato Celebrado em:</strong> {{ caderno.contrato_celebrado }}</p>
@@ -82,6 +82,5 @@
 <p><strong>Sugestões:</strong> {{ caderno.sugestoes }}</p>
 
 <a id="btn-voltar" class="btn-voltar" href="{% url 'contrato_detalhes' contract.id %}">Voltar</a>
-<a id="btn-pdf" class="btn-pdf" href="{% url 'visualizar_pdf' contract.id %}" target="_blank">Ver PDFs</a>
 <a id="btn-imp" href="{% url 'gerar_pdf_caderno' caderno.id %}" class="btn-imp">Imprimir</a>
 {% endblock %}
