@@ -178,6 +178,17 @@
         <br><br>
 
         <h1>Alertas</h1>
+
+        <label for="alerta_prazo"><strong>Alerta Prazo (em dias):</strong></label>
+        <input type="text" id="alerta_prazo" name="alerta_prazo" pattern="\d+" title="Apenas números" required value="{{ alerta_prazo }}">
+
+        <label for="alerta_valor"><strong>Alerta Valor (%):</strong></label>
+        <select id="alerta_valor" name="alerta_valor">
+            <option value="25%" {% if tipo_contrato == "25%" %}selected{% endif %}>25%</option>
+            <option value="50%" {% if tipo_contrato == "50%" %}selected{% endif %}>50%</option>
+            <option value="75%" {% if tipo_contrato == "75%" %}selected{% endif %}>75%</option>
+            <option value="100%" {% if tipo_contrato == "100%" %}selected{% endif %}>100%</option>
+        </select>
         
         <div style="display: flex; gap: 60px; align-items: flex-start;">
             <div style="display: flex; flex-direction: column;">

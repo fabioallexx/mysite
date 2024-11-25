@@ -1,7 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse, HttpResponseRedirect, FileResponse
 from .models import UploadedFile, Contract, CadernoEncargo, Historico, Fatura
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 import locale
 from django.contrib import messages
 from dateutil.relativedelta import relativedelta
@@ -118,6 +118,7 @@ def contrato_info(request, file_id):
         recorrente = request.POST.get("recorrente") == "Sim"
         compromisso = request.POST.get("compromisso") == "Sim"
         prazo = calcular_diferenca(data_inicial, data_final)
+        alerta_prazo = request.POST.get("aleta_prazo", "")
         
         if contract:
             estado = contract.estado
@@ -140,6 +141,7 @@ def contrato_info(request, file_id):
             contract.compromisso = compromisso
             contract.plurianual = plurianual
             contract.estado = estado
+            contract.aleta_prazo = alerta_prazo
             contract.save()
         else:
             contract = Contract(
@@ -164,6 +166,7 @@ def contrato_info(request, file_id):
                 uploaded_file=uploaded_file,
                 plurianual=plurianual,
                 estado=True,
+                alerta_prazo=alerta_prazo,
             )
             contract.save()
         return redirect('contrato_detalhes', contract_id=contract.id)
@@ -190,6 +193,7 @@ def contrato_info(request, file_id):
         "compromisso": 'Sim' if contract and contract.compromisso else 'Não',
         "plurianual": contract.plurianual if contract else '',
         "estado": contract.estado if contract else True, 
+        "alerta_prazo": contract.alerta_prazo if contract else '',
     })
 
 def get_global_context(request):
@@ -256,9 +260,18 @@ def caderno_encargos(request, contract_id):
 
 def contrato_detalhes(request, contract_id):
     contract = get_object_or_404(Contract, id=contract_id, user=request.user)
+
+    alerta_prazo = contract.alerta_prazo
+    prazo_alerta_data = contract.data_final - timedelta(days=int(alerta_prazo))
+
+    data_atual = timezone.now().date()
+
+    exibir_alerta_prazo = data_atual >= prazo_alerta_data
+
     context = {
         'contract': contract,
-        'faturas_existem': contract.fatura_set.exists()
+        'faturas_existem': contract.fatura_set.exists(),
+        'exibir_alerta_prazo': exibir_alerta_prazo,
     }
     context.update(get_global_context(request))
     return render(request, 'main/contrato_detalhes.html', context)
@@ -295,7 +308,8 @@ def fechar_contrato(request, contract_id):
         compromisso=contrato.compromisso,
         uploaded_file=contrato.uploaded_file,
         plurianual=contrato.plurianual,
-        _estado=False
+        _estado=False,
+        alerta_prazo=contrato.alerta_prazo,
     )
     historico.save()
 

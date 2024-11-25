@@ -110,6 +110,19 @@
 <p><strong>Recorrente:</strong> {{ contract.recorrente|yesno:"Sim,Não" }}</p>
 <p><strong>Compromisso:</strong> {{ contract.compromisso|yesno:"Sim,Não" }}</p>
 
+{% if exibir_alerta_prazo %}
+    <div >
+        <strong>Atenção!</strong> O prazo do contrato está prestes a expirar.
+    </div>
+{% endif %}
+
+<!-- Exibir alerta de valor se o valor entregue for maior ou igual ao valor de alerta -->
+{% if exibir_alerta_valor %}
+    <div class="alert alert-danger">
+        <strong>Atenção!</strong> O valor entregue atingiu ou ultrapassou o valor de alerta ({{ contrato.valor_alerta }}%).
+    </div>
+{% endif %}
+
 <a class="btn-editar" id="btn-editar" href="{% url 'contrato_info' file_id=contract.uploaded_file.id %}">Editar</a>
 <a id="btn-pdf" class="btn-pdf" href="{% url 'visualizar_pdf' contract.id %}" target="_blank">Ver PDFs</a>
 <a class="btn-voltar" id="btn-voltar" href="/">Voltar</a>

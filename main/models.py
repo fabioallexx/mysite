@@ -33,6 +33,7 @@ class Contract(models.Model):
     uploaded_file = models.ForeignKey(UploadedFile, on_delete=models.CASCADE)
     plurianual = models.TextField(blank=True, null=True)
     estado = models.BooleanField(default=True)
+    alerta_prazo = models.CharField(max_length=100)
 
     @property
     def is_active(self):
@@ -80,6 +81,7 @@ class Historico(models.Model):
     uploaded_file = models.ForeignKey(UploadedFile, on_delete=models.CASCADE)
     plurianual = models.TextField(blank=True, null=True)
     _estado = models.BooleanField(default=False)
+    alerta_prazo = models.CharField(max_length=100)
 
     def reativar_contrato(self):
         if self._estado:
@@ -104,7 +106,8 @@ class Historico(models.Model):
                 compromisso=self.compromisso,
                 uploaded_file=self.uploaded_file,
                 plurianual=self.plurianual,
-                estado=True
+                estado=True,
+                alerta_prazo=self.alerta_prazo,
             )
 
 class Fatura(models.Model):
