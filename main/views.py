@@ -118,7 +118,7 @@ def contrato_info(request, file_id):
         recorrente = request.POST.get("recorrente") == "Sim"
         compromisso = request.POST.get("compromisso") == "Sim"
         prazo = calcular_diferenca(data_inicial, data_final)
-        alerta_prazo = request.POST.get("aleta_prazo", "")
+        alerta_prazo = request.POST.get("alerta_prazo", "")
         
         if contract:
             estado = contract.estado
@@ -141,7 +141,7 @@ def contrato_info(request, file_id):
             contract.compromisso = compromisso
             contract.plurianual = plurianual
             contract.estado = estado
-            contract.aleta_prazo = alerta_prazo
+            contract.alerta_prazo = alerta_prazo
             contract.save()
         else:
             contract = Contract(
