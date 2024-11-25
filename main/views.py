@@ -267,11 +267,30 @@ def contrato_detalhes(request, contract_id):
     data_atual = timezone.now().date()
 
     exibir_alerta_prazo = data_atual >= prazo_alerta_data
+    dias = (contract.data_final - data_atual).days
+
+    valor_total = contract.valor_total
+    valor_entregue = contract.valor_entregue
+
+    porcentagem = (valor_entregue / valor_total) * 100 if valor_total > 0 else 0
+
+    alerta_valor = None
+    if porcentagem >= 100:
+        alerta_valor = "Atingiu 100% do valor total!"
+    elif porcentagem >= 75:
+        alerta_valor = "Atingiu 75% do valor total!"
+    elif porcentagem >= 50:
+        alerta_valor = "Atingiu 50% do valor total!"
+    elif porcentagem >= 25:
+        alerta_valor = "Atingiu 25% do valor total!"
 
     context = {
         'contract': contract,
         'faturas_existem': contract.fatura_set.exists(),
         'exibir_alerta_prazo': exibir_alerta_prazo,
+        'exibir_alerta_valor': alerta_valor is not None,
+        'alerta_valor': alerta_valor,
+        'dias': dias,
     }
     context.update(get_global_context(request))
     return render(request, 'main/contrato_detalhes.html', context)
