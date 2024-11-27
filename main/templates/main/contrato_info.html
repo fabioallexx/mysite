@@ -1,5 +1,5 @@
 {% extends 'main/base.html' %}
-
+{% load custom_filters %}
 {% block content %}
 <!DOCTYPE html>
 <html lang="pt-PT">
@@ -183,12 +183,23 @@
         <input type="text" id="alerta_prazo" name="alerta_prazo" pattern="\d+" title="Apenas números" required value="{{ alerta_prazo }}">
         
         <div style="display: flex; gap: 60px; align-items: flex-start;">
-            <div style="display: flex; flex-direction: column;">
-                <label for="plurianual"><strong>Plurianual:</strong></label>
-                <div id="plurianual" style="display: flex; gap: 10px; flex-wrap: wrap;">
-                    <!-- Os anos serão adicionados aqui pelo JavaScript -->
-                </div>
+            {% if anos_plurianual %}
+        {% for year in anos_plurianual %}
+            <div class="plurianual-year-input">
+                <label for="plurianual_valor_{{ year }}">Valor para {{ year }}:</label>
+                <input 
+                    type="text" 
+                    id="plurianual_valor_{{ year }}" 
+                    name="plurianual_valor_{{ year }}" 
+                    class="form-control"
+                    value="{{ plurianual_values|get_item:year|default_if_none:'' }}"
+                    placeholder="Valor para: {{ year }}"
+                >
             </div>
+        {% endfor %}
+    {% else %}
+        <p>Selecione uma data inicial e final para definir os anos plurianuais.</p>
+    {% endif %}
     
             <div style="display: flex; flex-direction: column;">
                 <label for="valor_entregue" style="margin-top: 3px;"><strong>Valor Entregue:</strong></label>
@@ -214,115 +225,148 @@
 
     <a href="/">Voltar</a>
 
-    <script>
-        function formatCurrency(input) {
-            let value = input.value.replace(/[^\d,€]/g, '').replace('€', '').trim();
-    
-            if ((value.match(/,/g) || []).length > 1) {
-                value = value.replace(/,/g, '');
-            }
-    
-            let parts = value.split(',');
-            parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-    
-            let formattedValue = parts.join(',');
-            if (formattedValue !== '') {
-                formattedValue += ' €';
-            }
-            input.value = formattedValue;
-    
-            setTimeout(() => {
-                input.setSelectionRange(formattedValue.length - 2, formattedValue.length - 2);
-            }, 0);
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const precoInput = document.getElementById('preco_contratual');
+        const valorEntregueInput = document.getElementById('valor_entregue');
+        const dataInicial = document.getElementById('data_inicial');
+        const dataFinal = document.getElementById('data_final');
+        const plurianualDiv = document.getElementById('plurianual');
+        const prazoInput = document.getElementById('prazo');
+        const pluriannualValuesContainer = document.getElementById('plurianual-values');
+        const totalContractValue = parseFloat('{{ contract.valor_total|default:0 }}');
+
+    function formatCurrency(input) {
+        let value = input.value.replace(/[^\d,€]/g, '').replace('€', '').trim();
+
+        if ((value.match(/,/g) || []).length > 1) {
+            value = value.replace(/,/g, '');
         }
-    
-        document.addEventListener('DOMContentLoaded', function () {
-            const precoInput = document.getElementById('preco_contratual');
-            const valorEntregueInput = document.getElementById('valor_entregue');
-    
-            precoInput.addEventListener('input', function () {
-                formatCurrency(precoInput);
-            });
-    
-            precoInput.addEventListener('focus', function () {
-                precoInput.value = precoInput.value.replace(' €', '');
-            });
-    
-            valorEntregueInput.addEventListener('input', function () {
-                formatCurrency(valorEntregueInput);
-            });
-    
-            valorEntregueInput.addEventListener('focus', function () {
-                valorEntregueInput.value = valorEntregueInput.value.replace(' €', '');
-            });
-    
-            const dataInicial = document.getElementById('data_inicial');
-            const dataFinal = document.getElementById('data_final');
-            const plurianualDiv = document.getElementById('plurianual');
-    
-            function calcularPrazo() {
-                const inicial = new Date(dataInicial.value);
-                const final = new Date(dataFinal.value);
-                const prazoInput = document.getElementById('prazo');
-    
-                if (!isNaN(inicial) && !isNaN(final)) {
-                    const umAno = 365 * 24 * 60 * 60 * 1000;
-                    const umMes = 30 * 24 * 60 * 60 * 1000;
-                    const prazoEmAnos = Math.floor((final - inicial) / umAno);
-                    const prazoEmMeses = Math.floor(((final - inicial) % umAno) / umMes);
-                    const prazoEmDias = Math.ceil(((final - inicial) % umAno) % umMes / (24 * 60 * 60 * 1000));
-                    
-                    let prazoTexto = '';
-                    if (prazoEmAnos > 0) {
-                        prazoTexto += prazoEmAnos + (prazoEmAnos === 1 ? ' ano' : ' anos');
-                    }
-                    if (prazoEmMeses > 0) {
-                        prazoTexto += (prazoTexto ? ', ' : '') + prazoEmMeses + (prazoEmMeses === 1 ? ' mês' : ' meses');
-                    }
-                    if (prazoEmDias > 0) {
-                        prazoTexto += (prazoTexto ? ' e ' : '') + prazoEmDias + (prazoEmDias === 1 ? ' dia' : ' dias');
-                    }
-                    prazoInput.value = prazoTexto || '0 dias';
-                } else {
-                    prazoInput.value = '';
-                }
+
+        const parts = value.split(',');
+        parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+        let formattedValue = parts.join(',');
+        if (formattedValue !== '') {
+            formattedValue += ' €';
+        }
+        input.value = formattedValue;
+
+        setTimeout(() => {
+            input.setSelectionRange(formattedValue.length - 2, formattedValue.length - 2);
+        }, 0);
+    }
+
+    precoInput.addEventListener('input', () => formatCurrency(precoInput));
+    precoInput.addEventListener('focus', () => precoInput.value = precoInput.value.replace(' €', ''));
+    valorEntregueInput.addEventListener('input', () => formatCurrency(valorEntregueInput));
+    valorEntregueInput.addEventListener('focus', () => valorEntregueInput.value = valorEntregueInput.value.replace(' €', ''));
+
+    function calcularPrazo() {
+        const inicial = new Date(dataInicial.value);
+        const final = new Date(dataFinal.value);
+
+        if (!isNaN(inicial) && !isNaN(final)) {
+            const diff = final - inicial;
+            const umAno = 365 * 24 * 60 * 60 * 1000;
+            const umMes = 30 * 24 * 60 * 60 * 1000;
+
+            const prazoEmAnos = Math.floor(diff / umAno);
+            const prazoEmMeses = Math.floor((diff % umAno) / umMes);
+            const prazoEmDias = Math.ceil(((diff % umAno) % umMes) / (24 * 60 * 60 * 1000));
+
+            let prazoTexto = '';
+            if (prazoEmAnos > 0) prazoTexto += `${prazoEmAnos} ${prazoEmAnos === 1 ? 'ano' : 'anos'}`;
+            if (prazoEmMeses > 0) prazoTexto += (prazoTexto ? ', ' : '') + `${prazoEmMeses} ${prazoEmMeses === 1 ? 'mês' : 'meses'}`;
+            if (prazoEmDias > 0) prazoTexto += (prazoTexto ? ' e ' : '') + `${prazoEmDias} ${prazoEmDias === 1 ? 'dia' : 'dias'}`;
+
+            prazoInput.value = prazoTexto || '0 dias';
+        } else {
+            prazoInput.value = '';
+        }
+    }
+
+    function calcularPlurianual() {
+        const inicial = new Date(dataInicial.value);
+        const final = new Date(dataFinal.value);
+
+        plurianualDiv.innerHTML = '';
+
+        if (!isNaN(inicial) && !isNaN(final)) {
+            for (let year = inicial.getFullYear(); year <= final.getFullYear(); year++) {
+                const yearDiv = document.createElement('div');
+                yearDiv.style.border = "1px solid #ccc";
+                yearDiv.style.padding = "5px";
+                yearDiv.textContent = year;
+                plurianualDiv.appendChild(yearDiv);
             }
-    
-            function calcularPlurianual() {
-                const inicial = new Date(dataInicial.value);
-                const final = new Date(dataFinal.value);
-                plurianualDiv.innerHTML = '';
-                
-                if (!isNaN(inicial) && !isNaN(final)) {
-                    const anos = [];
-                    for (let year = inicial.getFullYear(); year <= final.getFullYear(); year++) {
-                        anos.push(year);
-                    }
-    
-                    anos.forEach(year => {
-                        const yearDiv = document.createElement('div');
-                        yearDiv.style.border = "1px solid #ccc";
-                        yearDiv.style.padding = "5px";
-                        yearDiv.textContent = year;
-                        plurianualDiv.appendChild(yearDiv);
-                    });
-                }
-            }
-    
-            calcularPrazo();
-            calcularPlurianual();
-    
-            dataInicial.addEventListener('input', function() {
-                calcularPrazo();
-                calcularPlurianual();
-            });
-    
-            dataFinal.addEventListener('input', function() {
-                calcularPrazo();
-                calcularPlurianual();
-            });
+        }
+    }
+
+    function generatePluriannualInputs() {
+        const years = "{{ contract.plurianual }}".split(',').map(year => year.trim());
+        const existingValues = "{{ plurianual_values|safe|default:'{}' }}";
+        pluriannualValuesContainer.innerHTML = '';
+
+        years.forEach(year => {
+            const yearContainer = document.createElement('div');
+            yearContainer.className = 'year-allocation';
+            
+            const yearLabel = document.createElement('label');
+            yearLabel.textContent = `Ano ${year}: `;
+            
+            const yearInput = document.createElement('input');
+            yearInput.type = 'number';
+            yearInput.name = `plurianual_valor_${year}`;
+            yearInput.min = '0';
+            yearInput.max = totalContractValue.toFixed(2);
+            yearInput.step = '0.01';
+            yearInput.placeholder = '€';
+            
+            yearInput.value = existingValues[year] || '';
+            
+            yearInput.addEventListener('input', updateTotalAllocation);
+
+            yearContainer.appendChild(yearLabel);
+            yearContainer.appendChild(yearInput);
+            pluriannualValuesContainer.appendChild(yearContainer);
         });
-    </script>
+
+        updateTotalAllocation();
+    }
+
+    function updateTotalAllocation() {
+        const inputs = pluriannualValuesContainer.querySelectorAll('input[type="number"]');
+        let totalAllocated = 0;
+        
+        inputs.forEach(input => {
+            totalAllocated += parseFloat(input.value || 0);
+        });
+
+        const warningElement = document.getElementById('allocation-warning');
+        if (totalAllocated > totalContractValue) {
+            warningElement.textContent = `⚠️ Total alocado (${totalAllocated.toFixed(2)}€) excede o valor do contrato (${totalContractValue.toFixed(2)}€)`;
+            warningElement.style.color = 'red';
+        } else {
+            warningElement.textContent = `Total alocado: ${totalAllocated.toFixed(2)}€ / ${totalContractValue.toFixed(2)}€`;
+            warningElement.style.color = 'green';
+        }
+    }
+
+    calcularPrazo();
+    calcularPlurianual();
+    generatePluriannualInputs();
+
+    dataInicial.addEventListener('input', () => {
+        calcularPrazo();
+        calcularPlurianual();
+    });
+
+    dataFinal.addEventListener('input', () => {
+        calcularPrazo();
+        calcularPlurianual();
+    });
+});
+</script>
 </body>
 </html>
 {% endblock %}

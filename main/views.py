@@ -10,6 +10,7 @@ from decimal import Decimal, InvalidOperation
 import mimetypes
 from django.contrib.auth.decorators import login_required
 from xhtml2pdf import pisa
+import json
 from django.template import Context
 from django.template.loader import get_template
 import os
@@ -95,6 +96,13 @@ def contrato_info(request, file_id):
     tem_contrato = Contract.objects.filter(user=request.user).exists() if request.user.is_authenticated else False
     contract = Contract.objects.filter(uploaded_file=uploaded_file, user=request.user).first()
     estado = True
+
+    anos_plurianual = []
+    if contract and contract.data_inicial and contract.data_final:
+        ano_inicial = contract.data_inicial.year
+        ano_final = contract.data_final.year
+        anos_plurianual = list(range(ano_inicial, ano_final + 1))
+
     if request.method == "POST":
         objeto = request.POST.get("objeto", "")
         procedimento = request.POST.get("procedimento", "")
@@ -105,7 +113,6 @@ def contrato_info(request, file_id):
         nif = request.POST.get("nif", "")
         data_inicial = request.POST.get("data_inicial", "")
         data_final = request.POST.get("data_final", "")
-        anos_plurianual = gerar_plurianual(data_inicial, data_final)
         plurianual = ', '.join(map(str, anos_plurianual))
         preco_contratual_str = request.POST.get("preco_contratual", "").replace('€', '').replace('.', '').replace(',', '.').strip()
         valor_entregue_str = request.POST.get("valor_entregue", "").replace('€', '').replace('.', '').replace(',', '.').strip()
@@ -119,6 +126,25 @@ def contrato_info(request, file_id):
         compromisso = request.POST.get("compromisso") == "Sim"
         prazo = calcular_diferenca(data_inicial, data_final)
         alerta_prazo = request.POST.get("alerta_prazo", "")
+
+        plurianual_values = {}
+        for key, value in request.POST.items():
+            if key.startswith('plurianual_valor_'):
+                year = key.split('_')[-1]
+                try:
+                    value = value.replace('€', '').replace('.', '').replace(',', '.').strip()
+                    value_float = float(value) if value else 0.0
+                    plurianual_values[year] = value_float
+                except ValueError:
+                    messages.warning(request, f"Valor inválido para o ano {year}")
+                    plurianual_values[year] = 0.0
+
+        total_allocated = sum(plurianual_values.values())
+        if total_allocated > valor_total:
+            messages.error(request, 
+                f"Total alocado ({total_allocated:.2f}€) excede o valor do contrato ({valor_total:.2f}€)")
+
+        plurianual_json = json.dumps(plurianual_values) if plurianual_values else None
         
         if contract:
             estado = contract.estado
@@ -139,9 +165,9 @@ def contrato_info(request, file_id):
             contract.valor_entregue = valor_entregue
             contract.recorrente = recorrente
             contract.compromisso = compromisso
-            contract.plurianual = plurianual
             contract.estado = estado
             contract.alerta_prazo = alerta_prazo
+            contract.plurianual = plurianual_json
             contract.save()
         else:
             contract = Contract(
@@ -164,12 +190,19 @@ def contrato_info(request, file_id):
                 recorrente=recorrente,
                 compromisso=compromisso,
                 uploaded_file=uploaded_file,
-                plurianual=plurianual,
+                plurianual=plurianual_json,
+                anos_plurianual=anos_plurianual,
                 estado=True,
                 alerta_prazo=alerta_prazo,
             )
             contract.save()
         return redirect('contrato_detalhes', contract_id=contract.id)
+    plurianual_values = {}
+    if contract and contract.plurianual:
+        try:
+            plurianual_values = json.loads(contract.plurianual)
+        except (json.JSONDecodeError, TypeError):
+            plurianual_values = {}
     return render(request, 'main/contrato_info.html', {
         'uploaded_file': uploaded_file,
         "tem_contrato": tem_contrato,
@@ -194,6 +227,9 @@ def contrato_info(request, file_id):
         "plurianual": contract.plurianual if contract else '',
         "estado": contract.estado if contract else True, 
         "alerta_prazo": contract.alerta_prazo if contract else '',
+        "plurianual_values": plurianual_values,
+        "plurianual": contract.plurianual if contract else '',
+        "anos_plurianual": anos_plurianual,
     })
 
 def get_global_context(request):

@@ -18,3 +18,9 @@ def format_currency(value):
         return f"{formatted_value} €"
     except (ValueError, TypeError):
         return f"Erro ao formatar: {value}"
+    
+@register.filter(name='get_item')
+def get_item(dictionary, key):
+    if isinstance(dictionary, dict):
+        return dictionary.get(str(key))
+    return None
