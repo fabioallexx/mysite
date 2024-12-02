@@ -104,10 +104,35 @@
                 flex-direction: column;
             }
         }
+        .notification {
+            background-color: #f44336; /* Vermelho */
+            color: white;
+            padding: 15px;
+            position: fixed;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            border-radius: 5px;
+            width: 80%;
+            text-align: center;
+            font-size: 16px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: opacity 0.5s ease;
+        }
+
+        .notification.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
     </style>
 </head>
 <body>
     <h1>Informações do Contrato</h1>
+
+    <div id="notification" class="notification" style="display: none;">
+        O valor entregue não pode ser superior ao preço contratual. Por favor, edite o valor entregue.
+    </div>
     
     <p style="text-align: center; font-weight: bold;">
         {{ uploaded_file.name|slice:":-4"|title }}
@@ -235,6 +260,36 @@
         const prazoInput = document.getElementById('prazo');
         const pluriannualValuesContainer = document.getElementById('plurianual-values');
         const totalContractValue = parseFloat('{{ contract.valor_total|default:0 }}');
+        const form = document.querySelector('form');
+        const btnSalv = document.getElementById('btn-salv');
+
+        function verificarValorEntregue() {
+        const precoContratual = parseFloat(precoInput.value.replace(/[^\d,]/g, '').replace(',', '.')) || 0;
+        const valorEntregue = parseFloat(valorEntregueInput.value.replace(/[^\d,]/g, '').replace(',', '.')) || 0;
+
+        if (valorEntregue > precoContratual) {
+            // Exibe a notificação
+            notification.style.display = 'block';
+
+            // Após 5 segundos, a notificação desaparece
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 5000);
+
+            return false; // Impede o envio do formulário
+        }
+
+        // Esconde a notificação se a condição não for atendida
+        notification.style.display = 'none';
+        return true;
+    }
+
+    btnSalv.addEventListener('click', function (event) {
+        // Verifica se o valor entregue é superior ao preço contratual
+        if (!verificarValorEntregue()) {
+            event.preventDefault(); // Impede o envio do formulário
+        }
+    });
 
     function formatCurrency(input) {
         let value = input.value.replace(/[^\d,€]/g, '').replace('€', '').trim();

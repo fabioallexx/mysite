@@ -133,7 +133,7 @@
             <th>Pago</th>
         </tr>
         <tr>
-            <td></td>
+            <td>{{ contrato.plurianual|remover|formatar_valores }}</td>
             <td>{{ contrato.preco_contratual|format_currency }}</td>
             <td>{{ contrato.valor_entregue|format_currency }}</td>
             <td>{{ contrato.preco_contratual|format_currency }}</td>

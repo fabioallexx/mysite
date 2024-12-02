@@ -90,7 +90,12 @@
 
 {% if exibir_alerta_prazo %}
     <div class="alert alert-danger">
-        <strong class="strong_prazo">Atenção!</strong> O prazo do contrato está prestes a expirar. ({{ dias }} dia/s).
+        <strong class="strong_prazo">Atenção!</strong> 
+        {% if dias < 0 %}
+        Contrato expirado!
+        {% else %}
+        O prazo do contrato está prestes a expirar. ({{ dias }} dia/s)
+        {% endif %}
     </div>
 {% endif %}
 
@@ -147,58 +152,58 @@
  const dataInicial = new Date("{{ contract.data_inicial|date:'Y-m-d' }}");
  
  function calcularDiferenca(dataFinal) {
-     const agora = new Date();
-     const diff = dataFinal - agora;
+    const agora = new Date();
+    const diff = dataFinal - agora;
+
+    if (diff <= 0) {
+        return { anos: 0, meses: 0, dias: 0 };
+    }
+
+    let anos = dataFinal.getFullYear() - agora.getFullYear();
+    let meses = dataFinal.getMonth() - agora.getMonth();
+    let dias = dataFinal.getDate() - agora.getDate();
+
+    if (dias < 0) {
+        meses--;
+        const ultimoDiaMes = new Date(agora.getFullYear(), agora.getMonth() + 1, 0).getDate();
+        dias += ultimoDiaMes;
+    }
+    if (meses < 0) {
+        anos--;
+        meses += 12;
+    }
+
+    return { anos, meses, dias };
+}
  
-     if (diff < 0) {
-         return { anos: -1, meses: 0, dias: 0 };
-     }
- 
-     let anos = dataFinal.getFullYear() - agora.getFullYear();
-     let meses = dataFinal.getMonth() - agora.getMonth();
-     let dias = dataFinal.getDate() - agora.getDate();
- 
-     if (dias < 0) {
-         meses--;
-         const ultimoDiaMes = new Date(agora.getFullYear(), agora.getMonth() + 1, 0).getDate();
-         dias += ultimoDiaMes;
-     }
-     if (meses < 0) {
-         anos--;
-         meses += 12;
-     }
- 
-     return { anos, meses, dias };
- }
- 
- function updatePrazo() {
-     const { anos, meses, dias } = calcularDiferenca(dataFinal);
-         
-     const prazoElement = document.getElementById('prazo');
-     const prazoIcon = document.getElementById('prazo-icon');
-         
-     prazoElement.innerHTML = `${anos} ano${anos !== 1 ? 's' : ''}, ${meses} mes${meses !== 1 ? 'es' : ''}, ${dias} dia${dias !== 1 ? 's' : ''}`;
- 
-     if (anos < 0) {
-         prazoIcon.innerHTML = '🔴';
-     } else if (anos === 0 && meses === 0 && dias < 0) {
-         prazoIcon.innerHTML = '🔴';
-     } else if (anos === 0 && meses === 0) {
-         prazoIcon.innerHTML = '🟡';
-     } else if (anos === 0) {
-         prazoIcon.innerHTML = '🟢';
-     } else {
-         prazoIcon.innerHTML = '⚪';
-     }
- 
-     updateChart();
- }
+function updatePrazo() {
+    const { anos, meses, dias } = calcularDiferenca(dataFinal);
+
+    const prazoElement = document.getElementById('prazo');
+    const prazoIcon = document.getElementById('prazo-icon');
+
+    if (anos === 0 && meses === 0 && dias === 0) {
+        prazoElement.innerHTML = `Contrato expirado`;
+        prazoIcon.innerHTML = '🔴';
+    } else {
+        prazoElement.innerHTML = `${anos} ano${anos !== 1 ? 's' : ''}, ${meses} mes${meses !== 1 ? 'es' : ''}, ${dias} dia${dias !== 1 ? 's' : ''}`;
+        if (anos === 0 && meses === 0) {
+            prazoIcon.innerHTML = '🟡';
+        } else if (anos === 0) {
+            prazoIcon.innerHTML = '🟢';
+        } else {
+            prazoIcon.innerHTML = '⚪';
+        }
+    }
+
+    updateChart();
+}
  
  function updateChart() {
     const agora = new Date();
-    const totalTime = dataFinal - dataInicial;
-    const elapsedTime = agora - dataInicial;
-    const remainingTime = totalTime - elapsedTime;
+    const totalTime = Math.max(dataFinal - dataInicial, 0);
+    const elapsedTime = Math.max(agora - dataInicial, 0);
+    const remainingTime = Math.max(totalTime - elapsedTime, 0);
 
     const elapsed = calculateYearsMonthsDays(elapsedTime);
     const remaining = calculateYearsMonthsDays(remainingTime);
@@ -208,10 +213,7 @@
         `Tempo Restante: ${remaining.anos} ano(s), ${remaining.meses} mes(es), ${remaining.dias} dia(s)`
     ];
 
-    prazoChart.data.datasets[0].data = [
-        elapsedTime > 0 ? elapsedTime : 0,
-        remainingTime > 0 ? remainingTime : 0
-    ];
+    prazoChart.data.datasets[0].data = [elapsedTime, remainingTime];
     prazoChart.update();
 }
 
@@ -225,7 +227,7 @@ function calculateYearsMonthsDays(milliseconds) {
 
     if (dias < 0) {
         meses--;
-        dias += new Date(agora.getFullYear(), agora.getMonth() + 1, 0).getDate(); // days in the last month
+        dias += new Date(agora.getFullYear(), agora.getMonth() + 1, 0).getDate();
     }
     if (meses < 0) {
         anos--;
