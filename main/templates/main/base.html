@@ -165,9 +165,15 @@
             {% endif %}
         </div>
     </div>
+    {% if user.is_authenticated %}
     <div class="greeting">
         {% saudacao_e_hora user %}
     </div>
+    {% else %}
+    <div>
+
+    </div>
+    {% endif %}
 
     <div id="content" name="content" class="main">
         <div class="row justify-content-center">
