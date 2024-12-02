@@ -166,8 +166,8 @@
         </div>
     </div>
     {% if user.is_authenticated %}
-    <div class="greeting">
-        {% saudacao_e_hora user %}
+    <div class="greeting" id="greeting">
+        <span id="greeting-text">{% saudacao_e_hora user %}</span>
     </div>
     {% else %}
     <div>
@@ -215,6 +215,28 @@
             }
             isOpen = !isOpen;
         });
+
+        function updateGreeting(user) {
+        const greetingElement = document.getElementById('greeting-text');
+        const now = new Date();
+        const hours = now.getHours();
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        let greeting = '';
+
+        if (hours >= 5 && hours < 12) {
+            greeting = 'Bom dia';
+        } else if (hours >= 12 && hours < 18) {
+            greeting = 'Boa tarde';
+        } else {
+            greeting = 'Boa noite';
+        }
+
+        greetingElement.textContent = `${greeting}, ${user}! Agora são ${hours}:${minutes}`;
+    }
+
+    setInterval(() => updateGreeting('{{ user.username }}'), 1);
+
+    updateGreeting('{{ user.username }}');
     </script>
 </body>
 </html>
