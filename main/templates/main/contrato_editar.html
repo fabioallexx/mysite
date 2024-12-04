@@ -139,7 +139,7 @@
         {{ uploaded_file.name|slice:":-4"|title }}
     </p>
     
-    <form method="POST" action="{% url 'contrato_info' file_id=uploaded_file.id %}">
+    <form method="POST" action="{% url 'contrato_editar' file_id=uploaded_file.id %}">
         {% csrf_token %}
         
         <input type="hidden" name="user_id" value="{{ request.user.id }}">
@@ -346,18 +346,20 @@
         const fim = moment(dataFinalValue);
         const pluriannualContainer = document.getElementById('pluriannual-years');
 
-        pluriannualContainer.innerHTML = '';
+        pluriannualContainer.innerHTML = ''; // Limpa entradas anteriores.
 
         const startYear = inicio.year();
         const endYear = fim.year();
-        //const storedValues = JSON.parse('{{ plurianual|safe }}')
+        const storedValues = JSON.parse('{{ plurianual|safe }}'); // Obtenha os valores do backend.
+
+        console.log(storedValues)
 
         for (let year = startYear; year <= endYear; year++) {
             const yearContainer = document.createElement('div');
             yearContainer.className = 'form-group';
 
             const yearLabel = document.createElement('label');
-            yearLabel.innerHTML  = `<strong>Valor para ${year}: </strong>`;
+            yearLabel.textContent = `Valor para ${year}: `;
             yearLabel.setAttribute('for', `plurianual_valor_${year}`);
 
             const yearInput = document.createElement('input');
@@ -366,7 +368,8 @@
             yearInput.id = `plurianual_valor_${year}`;
             yearInput.className = 'form-control';
 
-            //yearInput.value = storedValues[year] || '';
+            // Preencha o valor, se disponível
+            yearInput.value = storedValues[year] || '';
 
             yearContainer.appendChild(yearLabel);
             yearContainer.appendChild(yearInput);
@@ -394,15 +397,15 @@
         }
     }
 
-    dataInicial.addEventListener('input', calculatePrazo);
-    dataFinal.addEventListener('input', calculatePrazo);
-    dataInicial.addEventListener('change', calculatePrazo);
-    dataFinal.addEventListener('change', calculatePrazo);
-
     dataInicial.addEventListener('input', generatePluriannualInputs);
     dataFinal.addEventListener('input', generatePluriannualInputs);
     dataInicial.addEventListener('change', generatePluriannualInputs);
     dataFinal.addEventListener('change', generatePluriannualInputs);
+
+    dataInicial.addEventListener('input', calculatePrazo);
+    dataFinal.addEventListener('input', calculatePrazo);
+    dataInicial.addEventListener('change', calculatePrazo);
+    dataFinal.addEventListener('change', calculatePrazo);
 
     if (dataInicial.value && dataFinal.value) {
         calculatePrazo();

@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from django.http import HttpResponse, HttpResponseRedirect, FileResponse
+from django.http import HttpResponse, HttpResponseRedirect, FileResponse, JsonResponse
 from .models import UploadedFile, Contract, CadernoEncargo, Historico, Fatura
 from datetime import datetime, date, timedelta
 import locale
@@ -13,7 +13,17 @@ from xhtml2pdf import pisa
 import json
 from django.template import Context
 from django.template.loader import get_template
+from django.views.decorators.http import require_http_methods
 import os
+
+@require_http_methods(["POST"])
+def calcular_diferenca_ajax(request):
+    data = json.loads(request.body)
+    data_inicial = data.get('data_inicial')
+    data_final = data.get('data_final')
+    
+    prazo = calcular_diferenca(data_inicial, data_final)
+    return JsonResponse({'prazo': prazo})
 
 def index(response, id):
     if response.method == "POST":
@@ -60,28 +70,39 @@ def upload_file(request):
     return redirect('home')
 
 def calcular_diferenca(data_inicial, data_final):
-    if isinstance(data_inicial, date) and isinstance(data_final, date):
-        diferenca = relativedelta(data_final, data_inicial)
-    else:
+    # Converter para datetime se forem strings
+    if isinstance(data_inicial, str):
         data_inicial = datetime.strptime(data_inicial, '%Y-%m-%d')
+    if isinstance(data_final, str):
         data_final = datetime.strptime(data_final, '%Y-%m-%d')
-        diferenca = relativedelta(data_final, data_inicial)
-    
-    partes = []
-    if diferenca.years:
-        partes.append(f"{diferenca.years} {'ano' if diferenca.years == 1 else 'anos'}")
-    if diferenca.months:
-        partes.append(f"{diferenca.months} {'mês' if diferenca.months == 1 else 'meses'}")
-    if diferenca.days:
-        partes.append(f"{diferenca.days} {'dia' if diferenca.days == 1 else 'dias'}")
 
+    # Calcular a diferença diretamente em dias
+    diferenca = (data_final - data_inicial).days
+
+    # Verificando a diferença de dias
+    if diferenca < 0:
+        return "0 dias"  # Se a data final for antes da data inicial
+
+    anos = diferenca // 365  # Aproximadamente 365 dias por ano
+    meses = (diferenca % 365) // 30  # Aproximadamente 30 dias por mês
+    dias = diferenca % 30  # O resto são os dias restantes
+
+    partes = []
+    if anos:
+        partes.append(f"{anos} {'ano' if anos == 1 else 'anos'}")
+    if meses:
+        partes.append(f"{meses} {'mês' if meses == 1 else 'meses'}")
+    if dias:
+        partes.append(f"{dias} {'dia' if dias == 1 else 'dias'}")
+
+    # Se houver mais de um componente de tempo, unimos com 'e'
     if len(partes) > 1:
-        partes[-1] = "e " + partes[-1]  
-        return ', '.join(partes[:-1]) + ' ' + partes[-1] 
-    elif partes: 
-        return partes[0]  
+        partes[-1] = "e " + partes[-1]
+        return ', '.join(partes[:-1]) + ' ' + partes[-1]
+    elif partes:
+        return partes[0]
     
-    return "0 dias" 
+    return "0 dias"
 
 def gerar_plurianual(data_inicial, data_final):
     anos = []
@@ -90,6 +111,147 @@ def gerar_plurianual(data_inicial, data_final):
         ano_final = datetime.strptime(data_final, '%Y-%m-%d').year
         anos = list(range(ano_inicial, ano_final + 1))
     return anos
+
+def contrato_editar(request, file_id):
+    uploaded_file = UploadedFile.objects.get(id=file_id, user=request.user)
+    tem_contrato = Contract.objects.filter(user=request.user).exists() if request.user.is_authenticated else False
+    contract = Contract.objects.filter(uploaded_file=uploaded_file, user=request.user).first()
+    estado = True
+
+    anos_plurianual = []
+    if contract and contract.data_inicial and contract.data_final:
+        ano_inicial = contract.data_inicial.year
+        ano_final = contract.data_final.year
+        anos_plurianual = list(range(ano_inicial, ano_final + 1))
+
+    if request.method == 'POST':
+        objeto = request.POST.get("objeto", "")
+        procedimento = request.POST.get("procedimento", "")
+        tipo_produto = request.POST.get("tipo_produto", "")
+        numero = request.POST.get("numero", "")
+        tipo_contrato = request.POST.get("tipo_contrato", "")
+        fornecedor = request.POST.get("fornecedor", "")
+        nif = request.POST.get("nif", "")
+        data_inicial = request.POST.get("data_inicial", "")
+        data_final = request.POST.get("data_final", "")
+        plurianual = ', '.join(map(str, anos_plurianual))
+        preco_contratual_str = request.POST.get("preco_contratual", "").replace('€', '').replace('.', '').replace(',', '.').strip()
+        valor_entregue_str = request.POST.get("valor_entregue", "").replace('€', '').replace('.', '').replace(',', '.').strip()
+        preco_contratual = float(preco_contratual_str) if preco_contratual_str else 0.0
+        valor_entregue = float(valor_entregue_str) if valor_entregue_str else 0.0
+        iva_str = request.POST.get("iva", "").replace('€', '').replace('.', '').replace(',', '.').strip()
+        iva = float(iva_str.replace('%', '').strip()) / 100 if iva_str else 0.0
+        valor_total = preco_contratual * (1 + iva)
+        observacao = request.POST.get("observacao", "")
+        recorrente = request.POST.get("recorrente") == "Sim"
+        compromisso = request.POST.get("compromisso") == "Sim"
+        prazo = calcular_diferenca(data_inicial, data_final)
+        alerta_prazo = request.POST.get("alerta_prazo", "")
+
+        plurianual_values = {}
+        for key, value in request.POST.items():
+            if key.startswith('plurianual_valor_'):
+                year = key.split('_')[-1]
+                try:
+                    value = value.replace('€', '').replace('.', '').replace(',', '.').strip()
+                    value_float = float(value) if value else 0.0
+                    plurianual_values[year] = value_float
+                except ValueError:
+                    messages.warning(request, f"Valor inválido para o ano {year}")
+                    plurianual_values[year] = 0.0
+
+        total_allocated = sum(plurianual_values.values())
+        if total_allocated > valor_total:
+            messages.error(request, 
+                f"Total alocado ({total_allocated:.2f}€) excede o valor do contrato ({valor_total:.2f}€)")
+
+        plurianual_json = json.dumps(plurianual_values) if plurianual_values else None
+        
+        if contract:
+            estado = contract.estado
+            contract.objeto = objeto
+            contract.procedimento = procedimento
+            contract.tipo_produto = tipo_produto
+            contract.numero = numero
+            contract.tipo_contrato = tipo_contrato
+            contract.fornecedor = fornecedor
+            contract.nif = nif
+            contract.data_inicial = data_inicial
+            contract.data_final = data_final
+            contract.prazo = prazo
+            contract.preco_contratual = preco_contratual
+            contract.iva = iva
+            contract.valor_total = valor_total
+            contract.observacao = observacao
+            contract.valor_entregue = valor_entregue
+            contract.recorrente = recorrente
+            contract.compromisso = compromisso
+            contract.estado = estado
+            contract.alerta_prazo = alerta_prazo
+            contract.plurianual = plurianual_json
+            contract.save()
+        else:
+            contract = Contract(
+                user=request.user,
+                objeto=objeto,
+                procedimento=procedimento,
+                tipo_produto=tipo_produto,
+                numero=numero,
+                tipo_contrato=tipo_contrato,
+                fornecedor=fornecedor,
+                nif=nif,
+                data_inicial=data_inicial,
+                data_final=data_final,
+                prazo=prazo,
+                preco_contratual=preco_contratual,
+                iva=iva,
+                valor_total=valor_total,
+                observacao=observacao,
+                valor_entregue=valor_entregue,
+                recorrente=recorrente,
+                compromisso=compromisso,
+                uploaded_file=uploaded_file,
+                plurianual=plurianual_json,
+                anos_plurianual=anos_plurianual,
+                estado=True,
+                alerta_prazo=alerta_prazo,
+            )
+            contract.save()
+        return redirect('contrato_detalhes', contract_id=contract.id)
+    plurianual_values = {}
+    if contract and contract.plurianual:
+        try:
+            plurianual_values = json.loads(contract.plurianual)
+        except (json.JSONDecodeError, TypeError):
+            plurianual_values = {}
+    return render(request, 'main/contrato_editar.html', {
+        'uploaded_file': uploaded_file,
+        "tem_contrato": tem_contrato,
+        "contract": contract,
+        "objeto": contract.objeto if contract else '',
+        "procedimento": contract.procedimento if contract else '',
+        "tipo_produto": contract.tipo_produto if contract else '',
+        "numero": contract.numero if contract else '',
+        "tipo_contrato": contract.tipo_contrato if contract else '',
+        "fornecedor": contract.fornecedor if contract else '',
+        "nif": contract.nif if contract else '',
+        "data_inicial": contract.data_inicial if contract else '',
+        "data_final": contract.data_final if contract else '',
+        "prazo": contract.prazo if contract else '',
+        "preco_contratual": contract.preco_contratual if contract else '',
+        "observacao": contract.observacao if contract else '',
+        "valor_entregue": contract.valor_entregue if contract else '',
+        "iva": contract.iva if contract else '',
+        "valor_total": contract.valor_total if contract else '',
+        "recorrente": 'Sim' if contract and contract.recorrente else 'Não',
+        "compromisso": 'Sim' if contract and contract.compromisso else 'Não',
+        "plurianual": contract.plurianual if contract else '',
+        "estado": contract.estado if contract else True, 
+        "alerta_prazo": contract.alerta_prazo if contract else '',
+        "plurianual_values": plurianual_values,
+        "plurianual": contract.plurianual if contract else '',
+        "anos_plurianual": anos_plurianual,
+    })
 
 def contrato_info(request, file_id):
     uploaded_file = UploadedFile.objects.get(id=file_id, user=request.user)

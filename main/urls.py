@@ -18,4 +18,6 @@ urlpatterns = [
     path('fatura/<int:fatura_id>/', views.detalhes_fatura, name='detalhes_fatura'),
     path('contrato/<int:contract_id>/pdf/', views.visualizar_pdf, name='visualizar_pdf'),
     path('gerar_pdf_caderno/<int:caderno_id>/', views.gerar_pdf_caderno, name='gerar_pdf_caderno'),
+    path('calcular_diferenca/', views.calcular_diferenca_ajax, name='calcular_diferenca_ajax'),
+    path('contrato_editar/<int:file_id>/', views.contrato_editar, name='contrato_editar'),
 ]

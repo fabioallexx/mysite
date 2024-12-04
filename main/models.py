@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.db.models import JSONField
 import json
 
 # Create your models here.
@@ -35,6 +36,7 @@ class Contract(models.Model):
     plurianual = models.TextField(blank=True, null=True)
     estado = models.BooleanField(default=True)
     alerta_prazo = models.CharField(max_length=100)
+    anos_plurianual = JSONField(blank=True, null=True)
 
     @property
     def is_active(self):
