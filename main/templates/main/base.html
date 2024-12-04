@@ -37,7 +37,7 @@
         }
 
         header {
-            background-color: white;
+            background-color: #f3f4f6;
         }
         .watermark {
             position: absolute;
@@ -129,6 +129,86 @@
             z-index: 10;
             text-align: right;
         }
+
+        :root {
+        --primary-color: #1e3a8a; 
+        --secondary-color: #2563eb;
+        --accent-color: #60a5fa; 
+        --background-color: #f3f4f6; 
+        --text-color: #111827; 
+        --light-gray: #e5e7eb;
+        --white: #ffffff;
+        --dark-background: #1a1a1a;
+        --dark-text: #f3f4f6;
+        }
+
+        body {
+            font-family: 'Open Sans', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+        }
+
+        body.dark-mode {
+            background-color: var(--dark-background);
+            color: var(--dark-text);
+        }
+
+        /* Modo Escuro para o cabeçalho */
+        body.dark-mode header {
+            background-color: #333;
+        }
+
+        /* Modo Escuro para a barra lateral */
+        body.dark-mode .sidenav {
+            background-color: #222;
+        }
+
+        /* Modo Escuro para os links */
+        body.dark-mode a {
+            color: var(--accent-color);
+        }
+
+        body.dark-mode ul {
+            background-color: #333; /* Fundo cinza escuro */
+            color: #f3f4f6; /* Texto branco */
+        }
+
+        body.dark-mode li {
+            background-color: #333; /* Fundo cinza escuro */
+            color: #f3f4f6; /* Texto branco */
+        }
+
+        /* Outras mudanças de estilo que você quer para o modo escuro */
+        body.dark-mode h1 {
+            color: var(--white);
+        }
+        #theme-toggle-btn {
+            position: fixed;
+            top: 60px;
+            right: 20px; /* Garante que o botão esteja à direita */
+            background-color: darkgrey; /* Altere para a cor que você preferir */
+            color: var(--white);
+            padding: 10px 15px;
+            border-radius: 5px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            font-size: 14px;
+            z-index: 10;
+            text-align: right;
+            border: none;
+            cursor: pointer;
+            
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px; /* Largura fixa para o botão */
+            height: 40px; /* Altura fixa para o botão */
+            padding: 0; /* Remove o padding para um design compacto */
+            font-size: 20px; /* Tamanho do emoji */
+            line-height: 1; /* Ajusta o espaçamento interno */
+            border-radius: 50%; /* Torna o botão circular */
+        }
     </style>
 
     <title>{% block title %}Contratos{% endblock %}</title>
@@ -175,6 +255,8 @@
     </div>
     {% endif %}
 
+    <button id="theme-toggle-btn" class="btn btn-secondary" aria-label="Toggle theme">🌙</button>
+
     <div id="content" name="content" class="main">
         <div class="row justify-content-center">
             <div class="col-8">
@@ -200,6 +282,7 @@
         const sidenav = document.getElementById('sidenav');
         const mainContent = document.querySelector('.main');
         const toggleBtn = document.getElementById('toggle-btn');
+        const themeToggleBtn = document.getElementById('theme-toggle-btn');
 
         let isOpen = true;
 
@@ -215,6 +298,24 @@
             }
             isOpen = !isOpen;
         });
+
+        document.addEventListener('DOMContentLoaded', () => {
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            document.body.classList.add('dark-mode');
+            themeToggleBtn.textContent = '☀️';
+        } else {
+            themeToggleBtn.textContent = '🌙';
+        }
+    });
+
+    themeToggleBtn.addEventListener('click', () => {
+        const isDarkMode = document.body.classList.toggle('dark-mode');
+        themeToggleBtn.textContent = isDarkMode ? '☀️' : '🌙';
+        
+        // Salvar a preferência no localStorage
+        localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
+    });
 
         function updateGreeting(user) {
         const greetingElement = document.getElementById('greeting-text');
