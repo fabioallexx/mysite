@@ -85,6 +85,7 @@ class Historico(models.Model):
     plurianual = models.TextField(blank=True, null=True)
     _estado = models.BooleanField(default=False)
     alerta_prazo = models.CharField(max_length=100)
+    anos_plurianual = JSONField(blank=True, null=True)
 
     def reativar_contrato(self):
         if self._estado:

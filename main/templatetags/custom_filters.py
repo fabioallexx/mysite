@@ -97,3 +97,10 @@ def jsonify(value):
         return json.dumps(value)
     except Exception:
         return '{}'
+
+@register.filter
+def multiply(value):
+    try:
+        return round(float(value) * 100)
+    except (TypeError, ValueError):
+        return 0

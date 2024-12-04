@@ -191,7 +191,7 @@
         <label for="prazo"><strong>Prazo:</strong></label>
         <input type="text" id="prazo" name="prazo" size="20" readonly style="background-color: #e9ecef; margin-right: 15px;" value="{{ prazo }}">
     
-        <label for="preco_contratual"><strong>Preço Contratual:</strong></label>
+        <label for="preco_contratual"><strong>Preço Contratual (s/IVA):</strong></label>
         <input type="text" id="preco_contratual" name="preco_contratual" required value="{{ preco_contratual }}">
 
         <label for="iva"><strong>IVA (%):</strong></label>
@@ -253,6 +253,28 @@
         const btnSalv = document.getElementById('btn-salv');
         //const pluriannualData = JSON.parse('{{ contract.plurianual|jsonify|safe }}');
 
+        function verificarDatas() {
+            const dataInicialValue = moment(dataInicial.value);
+            const dataFinalValue = moment(dataFinal.value);
+
+            if (dataInicialValue.isAfter(dataFinalValue)) {
+                notification.style.display = 'block';
+                notification.innerHTML = "A data inicial não pode ser superior à data final!"
+
+                setTimeout(() => {
+                    notification.style.display = 'none';
+                }, 5000);
+
+                return false;
+            }
+
+            notification.style.display = 'none';
+            return true;
+        }
+
+        dataInicial.addEventListener('change', verificarDatas);
+        dataFinal.addEventListener('change', verificarDatas);
+
         function verificarValorEntregue() {
             const precoContratual = parseFloat(precoInput.value.replace(/[^\d,]/g, '').replace(',', '.')) || 0;
             const valorEntregue = parseFloat(valorEntregueInput.value.replace(/[^\d,]/g, '').replace(',', '.')) || 0;
@@ -272,7 +294,7 @@
     }
 
     btnSalv.addEventListener('click', function (event) {
-        if (!verificarValorEntregue()) {
+        if (!verificarValorEntregue() || !verificarDatas()) {
             event.preventDefault();
         }
     });

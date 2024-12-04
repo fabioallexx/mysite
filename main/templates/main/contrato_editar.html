@@ -132,7 +132,7 @@
     <h1>Informações do Contrato</h1>
 
     <div id="notification" class="notification" style="display: none;">
-        O valor entregue não pode ser superior ao preço contratual. Por favor, edite o valor entregue.
+        
     </div>
     
     <p style="text-align: center; font-weight: bold;">
@@ -195,15 +195,12 @@
         <input type="text" id="preco_contratual" name="preco_contratual" required value="{{ preco_contratual }}">
 
         <label for="iva"><strong>IVA (%):</strong></label>
-        <select id="iva" name="iva">
-            <option value="0%" {% if tipo_contrato == "0%" %}selected{% endif %}>0%</option>
-            <option value="6%" {% if tipo_contrato == "6%" %}selected{% endif %}>6%</option>
-            <option value="13%" {% if tipo_contrato == "13%" %}selected{% endif %}>13%</option>
-            <option value="23%" {% if tipo_contrato == "23%" %}selected{% endif %}>23%</option>
+        <select id="iva" name="iva" required>
+            <option value="{{ iva }}" {% if iva == "{{ iva }}" %}selected{% endif %}>{{ iva|multiply }}%</option>
         </select>
     
         <label for="observacao"><strong>Observações:</strong></label>
-        <input type="text" id="observacao" name="observacao" size="60">
+        <input type="text" id="observacao" name="observacao" size="60" required value="{{ observacao }}">
 
         <br><br>
 
@@ -237,11 +234,13 @@
         <button type="submit" class="btn-salv" id="btn-salv">Salvar</button>
     </form>
 
-    <a href="/">Voltar</a>
+    <a href="{% url 'contrato_detalhes' contract.id %}">Voltar</a>
+
+    <input type="hidden" id="valor_total" name="valor_total" size="50" required value="{{ valor_total }}">
 
 <script>
         document.addEventListener('DOMContentLoaded', function () {
-        const precoInput = document.getElementById('preco_contratual');
+        const precoInput = document.getElementById('valor_total');
         const valorEntregueInput = document.getElementById('valor_entregue');
         const dataInicial = document.getElementById('data_inicial');
         const dataFinal = document.getElementById('data_final');
@@ -253,26 +252,49 @@
         const btnSalv = document.getElementById('btn-salv');
         //const pluriannualData = JSON.parse('{{ contract.plurianual|jsonify|safe }}');
 
+        function verificarDatas() {
+            const dataInicialValue = moment(dataInicial.value);
+            const dataFinalValue = moment(dataFinal.value);
+
+            if (dataInicialValue.isAfter(dataFinalValue)) {
+                notification.style.display = 'block';
+                notification.innerHTML = "A data inicial não pode ser superior à data final!"
+
+                setTimeout(() => {
+                    notification.style.display = 'none';
+                }, 5000);
+
+                return false;
+            }
+
+            notification.style.display = 'none';
+            return true;
+        }
+
+        dataInicial.addEventListener('change', verificarDatas);
+        dataFinal.addEventListener('change', verificarDatas);
+
         function verificarValorEntregue() {
             const precoContratual = parseFloat(precoInput.value.replace(/[^\d,]/g, '').replace(',', '.')) || 0;
             const valorEntregue = parseFloat(valorEntregueInput.value.replace(/[^\d,]/g, '').replace(',', '.')) || 0;
+            
+            if (valorEntregue > precoContratual) {
+                notification.style.display = 'block';
+                notification.innerHTML = "O valor entregue não pode ser superior ao valor total. Por favor, edite o valor entregue."
 
-        if (valorEntregue > precoContratual) {
-            notification.style.display = 'block';
+                setTimeout(() => {
+                    notification.style.display = 'none';
+                }, 5000);
 
-            setTimeout(() => {
-                notification.style.display = 'none';
-            }, 5000);
+                return false;
+            }
 
-            return false;
+            notification.style.display = 'none';
+            return true;
         }
 
-        notification.style.display = 'none';
-        return true;
-    }
-
     btnSalv.addEventListener('click', function (event) {
-        if (!verificarValorEntregue()) {
+        if (!verificarValorEntregue() || !verificarDatas()) {
             event.preventDefault();
         }
     });
