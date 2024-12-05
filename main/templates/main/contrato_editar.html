@@ -106,7 +106,7 @@
             }
         }
         .notification {
-            background-color: #f44336; /* Vermelho */
+            background-color: #f44336;
             color: white;
             padding: 15px;
             position: fixed;
@@ -368,11 +368,11 @@
         const fim = moment(dataFinalValue);
         const pluriannualContainer = document.getElementById('pluriannual-years');
 
-        pluriannualContainer.innerHTML = ''; // Limpa entradas anteriores.
+        pluriannualContainer.innerHTML = '';
 
         const startYear = inicio.year();
         const endYear = fim.year();
-        const storedValues = JSON.parse('{{ plurianual|safe }}'); // Obtenha os valores do backend.
+        const storedValues = JSON.parse('{{ plurianual|safe }}');
 
         console.log(storedValues)
 
@@ -390,7 +390,6 @@
             yearInput.id = `plurianual_valor_${year}`;
             yearInput.className = 'form-control';
 
-            // Preencha o valor, se disponível
             yearInput.value = storedValues[year] || '';
 
             yearContainer.appendChild(yearLabel);

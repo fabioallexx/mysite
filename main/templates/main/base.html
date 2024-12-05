@@ -155,40 +155,36 @@
             color: var(--dark-text);
         }
 
-        /* Modo Escuro para o cabeçalho */
         body.dark-mode header {
             background-color: #333;
         }
 
-        /* Modo Escuro para a barra lateral */
         body.dark-mode .sidenav {
             background-color: #222;
         }
 
-        /* Modo Escuro para os links */
         body.dark-mode a {
             color: var(--accent-color);
         }
 
         body.dark-mode ul {
-            background-color: #333; /* Fundo cinza escuro */
-            color: #f3f4f6; /* Texto branco */
+            background-color: #333;
+            color: #f3f4f6;
         }
 
         body.dark-mode li {
-            background-color: #333; /* Fundo cinza escuro */
-            color: #f3f4f6; /* Texto branco */
+            background-color: #333;
+            color: #f3f4f6;
         }
 
-        /* Outras mudanças de estilo que você quer para o modo escuro */
         body.dark-mode h1 {
             color: var(--white);
         }
         #theme-toggle-btn {
             position: fixed;
             top: 60px;
-            right: 20px; /* Garante que o botão esteja à direita */
-            background-color: darkgrey; /* Altere para a cor que você preferir */
+            right: 20px;
+            background-color: darkgrey;
             color: var(--white);
             padding: 10px 15px;
             border-radius: 5px;
@@ -202,12 +198,12 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            width: 40px; /* Largura fixa para o botão */
-            height: 40px; /* Altura fixa para o botão */
-            padding: 0; /* Remove o padding para um design compacto */
-            font-size: 20px; /* Tamanho do emoji */
-            line-height: 1; /* Ajusta o espaçamento interno */
-            border-radius: 50%; /* Torna o botão circular */
+            width: 40px;
+            height: 40px;
+            padding: 0;
+            font-size: 20px;
+            line-height: 1;
+            border-radius: 50%;
         }
     </style>
 
@@ -313,7 +309,6 @@
         const isDarkMode = document.body.classList.toggle('dark-mode');
         themeToggleBtn.textContent = isDarkMode ? '☀️' : '🌙';
         
-        // Salvar a preferência no localStorage
         localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
     });
 

@@ -14,10 +14,8 @@ class HistoricoAdmin(admin.ModelAdmin):
 
     def save_model(self, request, obj, form, change):
         super().save_model(request, obj, form, change)
-        if obj._estado:  # Se o estado for True
-            # Chame o método para reativar o contrato
+        if obj._estado:
             obj.reativar_contrato()
-            # Exclua o objeto do histórico
             obj.delete()
 
 admin.site.register(Historico, HistoricoAdmin)

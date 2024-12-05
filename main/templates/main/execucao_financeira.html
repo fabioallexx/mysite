@@ -132,14 +132,12 @@
 
         document.getElementById('faturaForm').onsubmit = function(event) {
             let valor = valorField.value
-                .replace(/[^\d,]/g, '')  // Remove tudo exceto números e vírgulas
-                .replace(',', '.')        // Substitui a vírgula por ponto
-                .trim();                 // Remove espaços em branco
+                .replace(/[^\d,]/g, '')
+                .replace(',', '.')
+                .trim();
 
-            // Remover o símbolo de euro
             valor = valor.replace('€', '').trim();
 
-            // Verifica se o valor está vazio após o processamento
             if (valor === '' || isNaN(valor)) {
                 event.preventDefault();
                 document.getElementById('valorError').textContent = 'Valor inválido.';
@@ -156,7 +154,7 @@
                 event.preventDefault();
                 document.getElementById('valorError').textContent = `O valor máximo que pode ser inserido é ${valorMaximo} €`;
             } else {
-                document.getElementById('valorError').textContent = ''; // Limpa mensagem de erro
+                document.getElementById('valorError').textContent = '';
             }
         };
     });

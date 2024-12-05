@@ -70,22 +70,19 @@ def upload_file(request):
     return redirect('home')
 
 def calcular_diferenca(data_inicial, data_final):
-    # Converter para datetime se forem strings
     if isinstance(data_inicial, str):
         data_inicial = datetime.strptime(data_inicial, '%Y-%m-%d')
     if isinstance(data_final, str):
         data_final = datetime.strptime(data_final, '%Y-%m-%d')
 
-    # Calcular a diferença diretamente em dias
     diferenca = (data_final - data_inicial).days
 
-    # Verificando a diferença de dias
     if diferenca < 0:
-        return "0 dias"  # Se a data final for antes da data inicial
+        return "0 dias"
 
-    anos = diferenca // 365  # Aproximadamente 365 dias por ano
-    meses = (diferenca % 365) // 30  # Aproximadamente 30 dias por mês
-    dias = diferenca % 30  # O resto são os dias restantes
+    anos = diferenca // 365
+    meses = (diferenca % 365) // 30
+    dias = diferenca % 30
 
     partes = []
     if anos:
@@ -95,7 +92,6 @@ def calcular_diferenca(data_inicial, data_final):
     if dias:
         partes.append(f"{dias} {'dia' if dias == 1 else 'dias'}")
 
-    # Se houver mais de um componente de tempo, unimos com 'e'
     if len(partes) > 1:
         partes[-1] = "e " + partes[-1]
         return ', '.join(partes[:-1]) + ' ' + partes[-1]
@@ -651,7 +647,7 @@ def render_to_pdf(template_src, context_dict={}):
     return response
 
 def gerar_pdf_caderno(request, caderno_id):
-    locale.setlocale(locale.LC_TIME, 'pt_PT.UTF-8')  # Define o locale para português
+    locale.setlocale(locale.LC_TIME, 'pt_PT.UTF-8')
     caderno = get_object_or_404(CadernoEncargo, id=caderno_id, user=request.user)
 
     current_date = datetime.now().strftime('%d de %B de %Y')
@@ -669,7 +665,7 @@ def gerar_pdf_caderno(request, caderno_id):
             'justificar_prazo': caderno.justificar_prazo,
             'defeitos': caderno.defeitos,
             'sugestoes': caderno.sugestoes,
-            'current_date': current_date  # Adiciona a data ao contexto
+            'current_date': current_date
         }
     }
     return render_to_pdf('main/template_relatorio.html', context)
