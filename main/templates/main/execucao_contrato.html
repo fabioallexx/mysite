@@ -115,7 +115,7 @@
             <th colspan="4">Tipo de Produto</th>
         </tr>
         <tr>
-            <td>{{ valor_sem_iva|format_currency }}</td>
+            <td>{{ contrato.preco_contratual|format_currency }}</td>
             <td>{{ valor_requisitado|format_currency }}</td>
             <td>{{ contrato.valor_entregue|format_currency }}</td>
             <td colspan="4">{{ contrato.tipo_produto }}</td>
