@@ -133,7 +133,7 @@
 <p><strong>Compromisso:</strong> {{ contract.compromisso|yesno:"Sim,Não" }}</p>
 
 <a class="btn-editar" id="btn-editar" href="{% url 'contrato_editar' file_id=contract.uploaded_file.id %}">Editar</a>
-<a id="btn-pdf" class="btn-pdf" href="{% url 'visualizar_pdf' contract.id %}" target="_blank">Ver PDFs</a>
+<a id="btn-pdf" class="btn-pdf" href="{% url 'visualizar_pdf' contract.id %}" target="_blank">Ver Contrato</a>
 <a class="btn-voltar" id="btn-voltar" href="/">Voltar</a>
 <!-- <a class="btn-exec" id="btn-exec" href="{% url 'execucao_contrato' contract.id %}">Consultar Execução</a> -->
  <div style="display: flex; justify-content: flex-end;">
